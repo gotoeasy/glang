@@ -113,6 +113,10 @@ func ContainsIngoreCase(str string, substr string) bool {
 	return strings.Index(ToLower(str), ToLower(substr)) > 0
 }
 
+func EqualsIngoreCase(str1 string, str2 string) bool {
+	return ToLower(str1) == ToLower(str2)
+}
+
 func ToLower(str string) string {
 	return strings.ToLower(str)
 }
