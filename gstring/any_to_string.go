@@ -2,9 +2,10 @@ package gstring
 
 import (
 	"fmt"
-	"glang/gtype"
 	"strconv"
 	"unsafe"
+
+	"github.com/gotoeasy/glang/gtype"
 )
 
 func ToBytes(s string) []byte {

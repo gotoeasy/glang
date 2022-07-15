@@ -1,10 +1,11 @@
 package gstring
 
 import (
-	"glang/gtype"
 	"log"
 	"math"
 	"testing"
+
+	"github.com/gotoeasy/glang/gtype"
 )
 
 func Test_tostring(t *testing.T) {
