@@ -8,14 +8,14 @@ import (
 )
 
 func ToString(v any, defaults ...string) string {
-	rs, err := anyToString(v)
+	rs, err := AnyToString(v)
 	if err != nil && len(defaults) > 0 {
 		return defaults[0]
 	}
 	return rs
 }
 
-func anyToString(v any) (string, error) {
+func AnyToString(v any) (string, error) {
 	v = gtype.AnyType(v)
 
 	switch s := v.(type) {

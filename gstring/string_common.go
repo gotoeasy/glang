@@ -104,3 +104,40 @@ func SubString(str string, start int, end int) string {
 	}
 	return rs
 }
+
+func Contains(str string, substr string) bool {
+	return strings.Index(str, substr) > 0
+}
+
+func ContainsIngoreCase(str string, substr string) bool {
+	return strings.Index(ToLower(str), ToLower(substr)) > 0
+}
+
+func ToLower(str string) string {
+	return strings.ToLower(str)
+}
+
+func ToUpper(str string) string {
+	return strings.ToUpper(str)
+}
+
+func Repeat(str string, count int) string {
+	return strings.Repeat(str, count)
+}
+
+func PadLeft(str string, pad string, length int) string {
+	if length < Len(str) {
+		return str
+	}
+	s := Repeat(pad, length) + str
+	max := Len(s)
+	return SubString(s, max-length, max)
+}
+
+func PadRight(str string, pad string, length int) string {
+	if length < Len(str) {
+		return str
+	}
+	s := str + Repeat(pad, length)
+	return SubString(s, 0, length)
+}
