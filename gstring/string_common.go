@@ -45,50 +45,12 @@ func Trim(str string) string {
 }
 
 func Startwiths(str string, startstr string) bool {
-
-	if startstr == "" || str == startstr {
-		return true
-	}
-
-	strs := []rune(str)
-	tmps := []rune(startstr)
-	lens := len(strs)
-	lentmp := len([]rune(tmps))
-	if lens < lentmp {
-		return false
-	}
-
-	for i := 0; i < lentmp; i++ {
-		if tmps[i] != strs[i] {
-			return false
-		}
-	}
-
-	return true
+	return IndexOf(str, startstr) == 0
 }
 
 func Endwiths(str string, endstr string) bool {
-
-	if endstr == "" || str == endstr {
-		return true
-	}
-
-	strs := []rune(str)
-	ends := []rune(endstr)
-	lens := len(strs)
-	lene := len(ends)
-	if lens < lene {
-		return false
-	}
-
-	dif := lens - lene
-	for i := lene - 1; i >= 0; i-- {
-		if strs[dif+i] != ends[i] {
-			return false
-		}
-	}
-
-	return true
+	rstr := Right(str, Len(endstr))
+	return rstr == endstr
 }
 
 func SubString(str string, start int, end int) string {
@@ -105,12 +67,17 @@ func SubString(str string, start int, end int) string {
 	return rs
 }
 
+func IndexOf(str string, substr string) int {
+	idx := strings.Index(str, substr)
+	return utf8.RuneCountInString(str[:idx])
+}
+
 func Contains(str string, substr string) bool {
-	return strings.Index(str, substr) > 0
+	return strings.Contains(str, substr)
 }
 
 func ContainsIngoreCase(str string, substr string) bool {
-	return strings.Index(ToLower(str), ToLower(substr)) > 0
+	return strings.Contains(ToLower(str), ToLower(substr))
 }
 
 func EqualsIngoreCase(str1 string, str2 string) bool {
@@ -144,4 +111,12 @@ func PadRight(str string, pad string, length int) string {
 	}
 	s := str + Repeat(pad, length)
 	return SubString(s, 0, length)
+}
+
+func Replace(str string, old string, new string, n int) string {
+	return strings.Replace(str, old, new, n)
+}
+
+func ReplaceAll(str string, old string, new string) string {
+	return strings.ReplaceAll(str, old, new)
 }
