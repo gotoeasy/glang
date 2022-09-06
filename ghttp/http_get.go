@@ -7,12 +7,12 @@ import (
 )
 
 // 固定Content-Type，其他自定义headers格式为 K:V
-func GetJson(url string, headers ...string) (string, error) {
+func GetJson(url string, headers ...string) ([]byte, error) {
 
 	// 请求
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// 请求头
@@ -28,10 +28,9 @@ func GetJson(url string, headers ...string) (string, error) {
 	//defer req.Body.Close()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer res.Body.Close()
 
-	by, err := io.ReadAll(res.Body)
-	return string(by), err
+	return io.ReadAll(res.Body)
 }

@@ -3,10 +3,12 @@ package ghttp
 import (
 	"log"
 	"testing"
+
+	"github.com/gotoeasy/glang/gstring"
 )
 
 func Test_tostring(t *testing.T) {
-	s, err := GetJson("http://baidu.com")
-	log.Println(s, err)
+	by, err := GetJson("http://baidu.com")
+	log.Println(gstring.ToString(by), err)
 
 }
