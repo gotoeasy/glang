@@ -7,12 +7,12 @@ import (
 )
 
 // 固定Content-Type，其他自定义headers格式为 K:V
-func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
+func PostJson(url string, jsondata string, headers ...string) (string, error) {
 
 	// 请求
 	req, err := http.NewRequest("POST", url, strings.NewReader(jsondata))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// 请求头
@@ -26,9 +26,10 @@ func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer res.Body.Close()
 
-	return io.ReadAll(res.Body)
+	by, err := io.ReadAll(res.Body)
+	return string(by), err
 }
