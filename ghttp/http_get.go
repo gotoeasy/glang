@@ -1,7 +1,7 @@
 package ghttp
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -14,7 +14,6 @@ func GetJson(url string, headers ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer req.Body.Close()
 
 	// 请求头
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -26,8 +25,12 @@ func GetJson(url string, headers ...string) ([]byte, error) {
 	// 读取响应内容
 	client := http.Client{}
 	res, err := client.Do(req)
+	//defer req.Body.Close()
+
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+
+	return io.ReadAll(res.Body)
 }

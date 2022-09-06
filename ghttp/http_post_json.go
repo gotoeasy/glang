@@ -1,7 +1,7 @@
 package ghttp
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -14,7 +14,6 @@ func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer req.Body.Close()
 
 	// 请求头
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -29,5 +28,7 @@ func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+
+	return io.ReadAll(res.Body)
 }

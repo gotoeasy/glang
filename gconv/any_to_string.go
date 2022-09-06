@@ -51,6 +51,8 @@ func AnyToString(v any) (string, error) {
 		return "", nil
 	case error:
 		return s.Error(), nil
+	case []byte:
+		return string(v.([]byte)), nil
 	default:
 		return "", errors.New("转换失败")
 	}
