@@ -1,4 +1,4 @@
-package ghttp
+package cmn
 
 import (
 	"io"
@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// 固定Content-Type，其他自定义headers格式为 K:V
-func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
+// 固定Content-Type:application/json;charset=UTF-8，其他自定义headers格式为 K:V
+func HttpGetJson(url string, headers ...string) ([]byte, error) {
 
 	// 请求
-	req, err := http.NewRequest("POST", url, strings.NewReader(jsondata))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -25,6 +25,8 @@ func PostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 	// 读取响应内容
 	client := http.Client{}
 	res, err := client.Do(req)
+	defer req.Body.Close()
+
 	if err != nil {
 		return nil, err
 	}

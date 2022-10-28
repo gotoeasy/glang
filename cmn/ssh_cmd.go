@@ -1,4 +1,4 @@
-package gssh
+package cmn
 
 import (
 	"log"
@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// 远程ssh执行命令
 func SshCmd(host string, port string, user string, password string, cmd ...string) (string, error) {
 
 	config := &ssh.ClientConfig{
