@@ -42,3 +42,7 @@ func Error(v ...any) {
 		log.Println(append([]any{"ERROR"}, v...))
 	}
 }
+
+func Fatal(v ...any) {
+	log.Fatalln(append([]any{"ERROR"}, v...))
+}
