@@ -21,32 +21,32 @@ func SetLogLevel(level string) {
 
 func Debug(v ...any) {
 	if logLevel <= 1 {
-		log.Println(append([]any{"DEBUG"}, v...))
+		log.Println(append([]any{"DEBUG"}, v...)...)
 	}
 }
 
 func Info(v ...any) {
 	if logLevel <= 2 {
-		log.Println(append([]any{"INFO"}, v...))
+		log.Println(append([]any{"INFO"}, v...)...)
 	}
 }
 
 func Warn(v ...any) {
 	if logLevel <= 3 {
-		log.Println(append([]any{"WARN"}, v...))
+		log.Println(append([]any{"WARN"}, v...)...)
 	}
 }
 
 func Error(v ...any) {
 	if logLevel <= 4 {
-		log.Println(append([]any{"ERROR"}, v...))
+		log.Println(append([]any{"ERROR"}, v...)...)
 	}
 }
 
 func Fatalln(v ...any) {
-	log.Fatalln(append([]any{"ERROR"}, v...))
+	log.Fatalln(append([]any{"FATAL"}, v...)...)
 }
 
 func Println(v ...any) {
-	log.Println(v)
+	log.Println(v...)
 }
