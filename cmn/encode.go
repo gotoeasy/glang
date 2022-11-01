@@ -1,6 +1,9 @@
 package cmn
 
 import (
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"hash/crc32"
 )
@@ -21,4 +24,14 @@ func Hash(str string) uint32 {
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
 func HashMod(str string, mod uint32) string {
 	return fmt.Sprint(Hash("添油"+str+"加醋") % mod)
+}
+
+func Base64(bts []byte) string {
+	return base64.StdEncoding.EncodeToString(bts)
+}
+
+func Md5(bts []byte) string {
+	h := md5.New()
+	h.Write(bts)
+	return hex.EncodeToString(h.Sum(nil))
 }

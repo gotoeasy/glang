@@ -1,7 +1,6 @@
 package cmn
 
 import (
-	"encoding/binary"
 	"strings"
 	"unicode/utf8"
 	"unsafe"
@@ -18,16 +17,6 @@ func StringToBytes(s string) []byte {
 
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
-}
-
-func Uint32ToBytes(num uint32) []byte {
-	bkey := make([]byte, 4)
-	binary.BigEndian.PutUint32(bkey, num)
-	return bkey
-}
-
-func BytesToUint32(bytes []byte) uint32 {
-	return uint32(binary.BigEndian.Uint32(bytes))
 }
 
 func Len(str string) int {
