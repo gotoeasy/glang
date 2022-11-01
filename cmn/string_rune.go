@@ -58,6 +58,10 @@ func Trim(str string) string {
 	return strings.TrimSpace(str)
 }
 
+func IsBlank(str string) bool {
+	return strings.TrimSpace(str) == ""
+}
+
 func Startwiths(str string, startstr string) bool {
 	lstr := Left(str, Len(startstr))
 	return lstr == startstr
