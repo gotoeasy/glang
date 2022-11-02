@@ -8,7 +8,7 @@ import (
 
 type AesEcb struct{}
 
-func NewEncryptAes() *AesEcb {
+func NewAesEcb() *AesEcb {
 	return &AesEcb{}
 }
 
