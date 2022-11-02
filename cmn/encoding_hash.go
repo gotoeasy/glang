@@ -30,6 +30,14 @@ func Base64(bts []byte) string {
 	return base64.StdEncoding.EncodeToString(bts)
 }
 
+func Base64Encode(bts []byte) string {
+	return base64.StdEncoding.EncodeToString(bts)
+}
+
+func Base64Decode(str string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(str)
+}
+
 func Md5(bts []byte) string {
 	h := md5.New()
 	h.Write(bts)
