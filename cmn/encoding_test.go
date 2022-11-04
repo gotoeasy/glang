@@ -11,10 +11,10 @@ func Test_aes_ecb(t *testing.T) {
 	key := "这是秘钥"
 	aes := NewAesEcb()
 
-	encode, _ := aes.EncodeStr(src, key)
+	encode, _ := aes.Encode(src, key)
 	log.Println((encode))
 
-	decode, err := aes.DecodeStr(encode, key)
+	decode, err := aes.Decode(encode, key)
 	log.Println((decode), err)
 
 }

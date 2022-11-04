@@ -13,8 +13,8 @@ func NewAesEcb() *AesEcb {
 }
 
 // 字符串加密
-func (a *AesEcb) EncodeStr(src string, secret string) (string, error) {
-	by, err := a.Encode(StringToBytes(src), StringToBytes(secret))
+func (a *AesEcb) Encode(src string, secret string) (string, error) {
+	by, err := a.EncodeBytes(StringToBytes(src), StringToBytes(secret))
 	if err != nil {
 		return "", err
 	}
@@ -22,13 +22,13 @@ func (a *AesEcb) EncodeStr(src string, secret string) (string, error) {
 }
 
 // 字符串解密
-func (a *AesEcb) DecodeStr(src string, secret string) (string, error) {
+func (a *AesEcb) Decode(src string, secret string) (string, error) {
 	srcBy, err := Base64Decode(src)
 	if err != nil {
 		return "", err
 	}
 
-	by, err := a.Decode(srcBy, StringToBytes(secret))
+	by, err := a.DecodeBytes(srcBy, StringToBytes(secret))
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +36,7 @@ func (a *AesEcb) DecodeStr(src string, secret string) (string, error) {
 	return BytesToString(by), nil
 }
 
-func (a *AesEcb) Encode(src []byte, secret []byte) ([]byte, error) {
+func (a *AesEcb) EncodeBytes(src []byte, secret []byte) ([]byte, error) {
 	if len(src) == 0 {
 		return src, nil // 空内容加密结果仍旧空
 	}
@@ -60,7 +60,7 @@ func (a *AesEcb) Encode(src []byte, secret []byte) ([]byte, error) {
 	return dst, nil
 }
 
-func (a *AesEcb) Decode(src []byte, secret []byte) ([]byte, error) {
+func (a *AesEcb) DecodeBytes(src []byte, secret []byte) ([]byte, error) {
 	if len(src) == 0 {
 		return src, nil // 空内容加密结果仍旧空
 	}
