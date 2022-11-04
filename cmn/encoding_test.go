@@ -9,12 +9,12 @@ import (
 func Test_aes_ecb(t *testing.T) {
 	src := "这是待加密的字符串abc这是待加密的字符串abc这是待这是待加密的字符串abc"
 	key := "这是秘钥"
-	aes := NewAesEcb()
+	aes := NewAesEcb(key)
 
-	encode, _ := aes.Encode(src, key)
+	encode, _ := aes.Encode(src)
 	log.Println((encode))
 
-	decode, err := aes.Decode(encode, key)
+	decode, err := aes.Decode(encode)
 	log.Println((decode), err)
 
 }

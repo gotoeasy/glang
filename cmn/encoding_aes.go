@@ -6,15 +6,17 @@ import (
 	"errors"
 )
 
-type AesEcb struct{}
+type AesEcb struct {
+	Secret []byte
+}
 
-func NewAesEcb() *AesEcb {
-	return &AesEcb{}
+func NewAesEcb(secret string) *AesEcb {
+	return &AesEcb{Secret: StringToBytes(secret)}
 }
 
 // 字符串加密
-func (a *AesEcb) Encode(src string, secret string) (string, error) {
-	by, err := a.EncodeBytes(StringToBytes(src), StringToBytes(secret))
+func (a *AesEcb) Encode(src string) (string, error) {
+	by, err := a.EncodeBytes(StringToBytes(src), a.Secret)
 	if err != nil {
 		return "", err
 	}
@@ -22,13 +24,13 @@ func (a *AesEcb) Encode(src string, secret string) (string, error) {
 }
 
 // 字符串解密
-func (a *AesEcb) Decode(src string, secret string) (string, error) {
+func (a *AesEcb) Decode(src string) (string, error) {
 	srcBy, err := Base64Decode(src)
 	if err != nil {
 		return "", err
 	}
 
-	by, err := a.DecodeBytes(srcBy, StringToBytes(secret))
+	by, err := a.DecodeBytes(srcBy, a.Secret)
 	if err != nil {
 		return "", err
 	}
