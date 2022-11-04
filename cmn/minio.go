@@ -40,3 +40,21 @@ func (m *Minio) Upload(localPathFile string, minioObjectName string) error {
 
 	return nil
 }
+
+func (m *Minio) Download(minioObjectName string, localPathFile string) error {
+	ctx := context.Background()
+
+	// 初始化
+	minioClient, err := minio.New(m.Endpoint, &minio.Options{Creds: credentials.NewStaticV4(m.Username, m.Password, ""), Secure: false})
+	if err != nil {
+		return err
+	}
+
+	// 下载
+	err = minioClient.FGetObject(ctx, m.Bucket, minioObjectName, localPathFile, minio.GetObjectOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
