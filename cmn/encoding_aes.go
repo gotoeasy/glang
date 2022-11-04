@@ -8,17 +8,17 @@ import (
 
 // 对称加密结构体
 type AesEcb struct {
-	Secret []byte
+	secret []byte
 }
 
 // 创建指定密码的对称加密对象
 func NewAesEcb(secret string) *AesEcb {
-	return &AesEcb{Secret: StringToBytes(secret)}
+	return &AesEcb{secret: StringToBytes(secret)}
 }
 
 // 字符串加密
 func (a *AesEcb) Encode(src string) (string, error) {
-	by, err := a.EncodeBytes(StringToBytes(src), a.Secret)
+	by, err := a.EncodeBytes(StringToBytes(src), a.secret)
 	if err != nil {
 		return "", err
 	}
@@ -32,7 +32,7 @@ func (a *AesEcb) Decode(src string) (string, error) {
 		return "", err
 	}
 
-	by, err := a.DecodeBytes(srcBy, a.Secret)
+	by, err := a.DecodeBytes(srcBy, a.secret)
 	if err != nil {
 		return "", err
 	}
