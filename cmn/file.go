@@ -11,6 +11,11 @@ func PathSeparator() string {
 	return string(os.PathSeparator)
 }
 
+// 取文件名，如“abc.txt”
+func FileName(name string) string {
+	return path.Base(ReplaceAll(name, "\\", "/"))
+}
+
 // 取文件扩展名，如“.txt”
 func FileExtName(name string) string {
 	return path.Ext(name)
