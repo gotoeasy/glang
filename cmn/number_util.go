@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"bytes"
 	"encoding/binary"
 	"math/rand"
 	"strconv"
@@ -10,6 +11,14 @@ import (
 // int 转 string
 func IntToStr(i int) string {
 	return strconv.Itoa(i)
+}
+
+// int 转 []byte
+func IntToBytes(intNum int) []byte {
+	uint16Num := uint16(intNum)
+	buf := bytes.NewBuffer([]byte{})
+	binary.Write(buf, binary.LittleEndian, uint16Num)
+	return buf.Bytes()
 }
 
 // uint32 转 []byte
