@@ -7,6 +7,7 @@ require golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
@@ -26,6 +27,7 @@ require (
 require (
 	github.com/minio/minio-go/v7 v7.0.43
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+	github.com/syndtr/goleveldb v1.0.0
 	github.com/valyala/fasthttp v1.41.0
 	golang.org/x/image v0.1.0
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
