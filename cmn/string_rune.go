@@ -1,7 +1,9 @@
 package cmn
 
 import (
+	"math/rand"
 	"strings"
+	"time"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -146,4 +148,15 @@ func Reverse(str string) string {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
+}
+
+func RandomString(length int) string {
+	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	bytes := []byte(str)
+	var result []byte
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < length; i++ {
+		result = append(result, bytes[r.Intn(len(bytes))])
+	}
+	return string(result)
 }
