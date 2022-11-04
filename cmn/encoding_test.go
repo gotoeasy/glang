@@ -6,6 +6,37 @@ import (
 	"testing"
 )
 
+func Test_rsa(t *testing.T) {
+	err := GenerateRsaKeyFile(2048, "f:/pri.pem", "f:/pub.pem")
+	if err != nil {
+		Error(err)
+	}
+
+	src := "公钥加密则私钥解密，私钥加密则公钥解密，本包只支持公钥加密私钥解密。公钥是公开的，私钥自己持有，通常私钥用于解密才具备秘钥的意义。"
+	encodeStr, err := EncodeRsa(src, "f:/pub.pem")
+	if err != nil {
+		Error(err)
+	} else {
+		Info(encodeStr)
+	}
+
+	str, err := DecodeRsa(encodeStr, "f:/pri.pem")
+	if err != nil {
+		Error(err)
+	} else {
+		Info(str)
+	}
+}
+
+func Test_base64(t *testing.T) {
+	data := StringToBytes("这是待加密的字符串abc这是待加密的字符串abc这是待这是待加密的字符串abcxxx")
+	s := Base64(data)
+
+	Info(s)
+	by, _ := Base64Decode(s)
+	Info(BytesToString(by))
+}
+
 func Test_aes_ecb(t *testing.T) {
 	src := "这是待加密的字符串abc这是待加密的字符串abc这是待这是待加密的字符串abc"
 	key := "这是秘钥"
