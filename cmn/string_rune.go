@@ -183,3 +183,13 @@ func RandomString(length int) string {
 	}
 	return BytesToString(result)
 }
+
+// 字符串切割
+func Split(str string, sep string) []string {
+	return strings.Split(str, sep)
+}
+
+// 字符串数组拼接为字符串
+func Join(elems []string, sep string) string {
+	return strings.Join(elems, sep)
+}

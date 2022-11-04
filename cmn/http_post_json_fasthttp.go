@@ -1,7 +1,6 @@
 package cmn
 
 import (
-	"strings"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -20,8 +19,8 @@ func FasthttpPostJson(url string, jsondata string, headers ...string) ([]byte, e
 	req.Header.SetMethod("POST")
 	req.Header.SetContentType("application/json;charset=UTF-8")
 	for i, max := 0, len(headers); i < max; i++ {
-		strs := strings.Split(headers[i], ":")
-		req.Header.Set(strings.TrimSpace(strs[0]), strings.TrimSpace(strs[1]))
+		strs := Split(headers[i], ":")
+		req.Header.Set(Trim(strs[0]), Trim(strs[1]))
 	}
 
 	// res := &fasthttp.Response{}

@@ -4,7 +4,6 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"strings"
 )
 
 // 是否Windows系统
@@ -52,10 +51,10 @@ func GetEnvBool(name string, defaultValue bool) bool {
 		return defaultValue
 	}
 
-	if strings.ToLower(s) == "true" {
+	if ToLower(s) == "true" {
 		return true
 	}
-	if strings.ToLower(s) == "false" {
+	if ToLower(s) == "false" {
 		return false
 	}
 	return defaultValue

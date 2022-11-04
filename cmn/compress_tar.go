@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // 打包指定目录为指定的tar文件
@@ -50,7 +49,7 @@ func TarDir(directory string, tarfilename string) error {
 
 		// 写入文件头
 		name := SubString(path, lenPrefix+1, Len(path))
-		name = strings.ReplaceAll(name, "\\", "/")
+		name = ReplaceAll(name, "\\", "/")
 		hr := &tar.Header{
 			Name:    name,          // 用相对目录名
 			Format:  tar.FormatGNU, // 支持中文目录文件名
@@ -103,7 +102,7 @@ func UnTar(tarFile string, dist string) error {
 		}
 		full := filepath.Join(distDir, hdr.Name)
 		if IsWin() {
-			full = filepath.Join(distDir, strings.ReplaceAll(hdr.Name, "/", "\\"))
+			full = filepath.Join(distDir, ReplaceAll(hdr.Name, "/", "\\"))
 		}
 		if hdr.FileInfo().IsDir() {
 			os.MkdirAll(full, 0777)
