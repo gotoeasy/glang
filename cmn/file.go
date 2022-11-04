@@ -6,6 +6,7 @@ import (
 	"path"
 )
 
+// 路径分隔符
 func PathSeparator() string {
 	return string(os.PathSeparator)
 }

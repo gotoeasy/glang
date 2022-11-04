@@ -6,10 +6,12 @@ import (
 	"errors"
 )
 
+// 对称加密结构体
 type AesEcb struct {
 	Secret []byte
 }
 
+// 创建指定密码的对称加密对象
 func NewAesEcb(secret string) *AesEcb {
 	return &AesEcb{Secret: StringToBytes(secret)}
 }
@@ -38,6 +40,7 @@ func (a *AesEcb) Decode(src string) (string, error) {
 	return BytesToString(by), nil
 }
 
+// 字节数组加密
 func (a *AesEcb) EncodeBytes(src []byte, secret []byte) ([]byte, error) {
 	if len(src) == 0 {
 		return src, nil // 空内容加密结果仍旧空
@@ -62,6 +65,7 @@ func (a *AesEcb) EncodeBytes(src []byte, secret []byte) ([]byte, error) {
 	return dst, nil
 }
 
+// 字节数组解密
 func (a *AesEcb) DecodeBytes(src []byte, secret []byte) ([]byte, error) {
 	if len(src) == 0 {
 		return src, nil // 空内容加密结果仍旧空

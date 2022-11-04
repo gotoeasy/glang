@@ -7,6 +7,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+// 使用Fasthttp进行Post请求，固定Content-Type:application/json;charset=UTF-8，其他自定义headers格式为 K:V
 func FasthttpPostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 
 	// req := &fasthttp.Request{}

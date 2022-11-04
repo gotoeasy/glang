@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// 固定Content-Type，其他自定义headers格式为 K:V
+// 使用标准包进行Post请求，固定Content-Type:application/json;charset=UTF-8，其他自定义headers格式为 K:V
 func HttpPostJson(url string, jsondata string, headers ...string) ([]byte, error) {
 
 	// 请求

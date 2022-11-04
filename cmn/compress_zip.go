@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// 压缩指定目录为指定的zip文件
 func Zip(srcFileorpath string, zipPathFile string) error {
 	zipFile, err := os.Create(zipPathFile)
 	if err != nil {
@@ -59,6 +60,7 @@ func Zip(srcFileorpath string, zipPathFile string) error {
 	return nil
 }
 
+// 解压指定zip文件
 func UnZip(zipFile string, destPath string) error {
 	zipReader, err := zip.OpenReader(zipFile)
 	if err != nil {

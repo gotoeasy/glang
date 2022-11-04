@@ -20,6 +20,7 @@ func init() {
 	}()
 }
 
+// 注册退出处理函数，在接收到SIGTERM或SIGINT信号时执行
 func OnExit(fnExit func()) {
 	exitFuncs = append(exitFuncs, fnExit)
 }

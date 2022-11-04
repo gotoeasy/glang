@@ -7,6 +7,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
+// Minio客户端结构体
 type Minio struct {
 	Endpoint string
 	Username string
@@ -14,6 +15,7 @@ type Minio struct {
 	Bucket   string
 }
 
+// 上传文件
 func (m *Minio) Upload(localPathFile string, minioObjectName string) error {
 	ctx := context.Background()
 
@@ -41,6 +43,7 @@ func (m *Minio) Upload(localPathFile string, minioObjectName string) error {
 	return nil
 }
 
+// 下载文件
 func (m *Minio) Download(minioObjectName string, localPathFile string) error {
 	ctx := context.Background()
 

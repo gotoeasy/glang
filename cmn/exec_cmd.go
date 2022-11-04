@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-// 执行命令
+// 执行命令（Windows时为cmd，否则是bash）
 func ExecCmd(command string) (stdout, stderr string, err error) {
 	var out bytes.Buffer
 	var errout bytes.Buffer

@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// 打包指定目录为指定的tar文件
 func TarDir(directory string, tarfilename string) error {
 
 	if !IsExistDir(directory) {

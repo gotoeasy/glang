@@ -8,6 +8,7 @@ import (
 	"unsafe"
 )
 
+// string 转 []byte
 func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(
 		&struct {
@@ -17,14 +18,17 @@ func StringToBytes(s string) []byte {
 	))
 }
 
+// []byte 转 string
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
+// 按文字计算字符串长度
 func Len(str string) int {
 	return utf8.RuneCountInString(str)
 }
 
+// 取左文字
 func Left(str string, length int) string {
 	if Len(str) <= length {
 		return str
@@ -40,6 +44,7 @@ func Left(str string, length int) string {
 	return rs
 }
 
+// 取右文字
 func Right(str string, length int) string {
 	lenr := Len(str)
 	if lenr <= length {
@@ -56,24 +61,29 @@ func Right(str string, length int) string {
 	return rs
 }
 
+// 去除两边空格
 func Trim(str string) string {
 	return strings.TrimSpace(str)
 }
 
+// 判断是否空白
 func IsBlank(str string) bool {
 	return strings.TrimSpace(str) == ""
 }
 
+// 判断是否指定前缀
 func Startwiths(str string, startstr string) bool {
 	lstr := Left(str, Len(startstr))
 	return lstr == startstr
 }
 
+// 判断是否指定后缀
 func Endwiths(str string, endstr string) bool {
 	rstr := Right(str, Len(endstr))
 	return rstr == endstr
 }
 
+// 按文字截取字符串
 func SubString(str string, start int, end int) string {
 	srune := []rune(str)
 	slen := len(srune)
@@ -88,35 +98,43 @@ func SubString(str string, start int, end int) string {
 	return rs
 }
 
+// 查找文字下标
 func IndexOf(str string, substr string) int {
 	idx := strings.Index(str, substr)
 	return utf8.RuneCountInString(str[:idx])
 }
 
+// 判断是否包含（区分大小写）
 func Contains(str string, substr string) bool {
 	return IndexOf(str, substr) >= 0
 }
 
+// 判断是否包含（忽略大小写）
 func ContainsIngoreCase(str string, substr string) bool {
 	return IndexOf(ToLower(str), ToLower(substr)) >= 0
 }
 
+// 判断是否相同（忽略大小写）
 func EqualsIngoreCase(str1 string, str2 string) bool {
 	return ToLower(str1) == ToLower(str2)
 }
 
+// 转小写
 func ToLower(str string) string {
 	return strings.ToLower(str)
 }
 
+// 转大写
 func ToUpper(str string) string {
 	return strings.ToUpper(str)
 }
 
+// 重复
 func Repeat(str string, count int) string {
 	return strings.Repeat(str, count)
 }
 
+// 左补足
 func PadLeft(str string, pad string, length int) string {
 	if length < Len(str) {
 		return str
@@ -126,6 +144,7 @@ func PadLeft(str string, pad string, length int) string {
 	return SubString(s, max-length, max)
 }
 
+// 右补足
 func PadRight(str string, pad string, length int) string {
 	if length < Len(str) {
 		return str
@@ -134,14 +153,17 @@ func PadRight(str string, pad string, length int) string {
 	return SubString(s, 0, length)
 }
 
+// 替换
 func Replace(str string, old string, new string, n int) string {
 	return strings.Replace(str, old, new, n)
 }
 
+// 全部替换
 func ReplaceAll(str string, old string, new string) string {
 	return strings.ReplaceAll(str, old, new)
 }
 
+// 反转
 func Reverse(str string) string {
 	r := []rune(str)
 	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
@@ -150,6 +172,7 @@ func Reverse(str string) string {
 	return string(r)
 }
 
+// 随机半角英数字符串
 func RandomString(length int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
@@ -158,5 +181,5 @@ func RandomString(length int) string {
 	for i := 0; i < length; i++ {
 		result = append(result, bytes[r.Intn(len(bytes))])
 	}
-	return string(result)
+	return BytesToString(result)
 }
