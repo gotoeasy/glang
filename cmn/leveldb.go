@@ -18,7 +18,7 @@ type LevelDB struct {
 	mu      sync.Mutex  // 锁
 }
 
-// 创建存储对象，参数dbPath为数据库名目录
+// 创建LevelDB对象，参数dbPath为数据库名目录
 func NewLevelDB(dbPath string) (*LevelDB, error) {
 	db := &LevelDB{
 		dbPath: dbPath,
