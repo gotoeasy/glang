@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// 自动文件压缩为gzip文件（文件名不支持中文）
+// 指定文件压缩为gzip文件（文件名不支持中文）
 func Gzip(srcFile string, gzipFile string) error {
 	inFile, err := os.Open(srcFile)
 	if err != nil {
