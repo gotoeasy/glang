@@ -99,8 +99,8 @@ func GenerateRsaKeyFile(keySize int, priKeyFile, pubKeyFile string) error {
 		return err
 	}
 
-	os.WriteFile(priKeyFile, pri, 0666)
-	os.WriteFile(pubKeyFile, pub, 0666)
+	WriteFileBytes(priKeyFile, pri)
+	WriteFileBytes(pubKeyFile, pub)
 	return nil
 }
 

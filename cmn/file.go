@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // 路径分隔符
@@ -75,4 +76,15 @@ func CopyFile(srcFilePath string, dstFilePath string) error {
 			return err
 		}
 	}
+}
+
+// 写文件（指定目录不存在时先创建，不含目录时存当前目录）
+func WriteFileString(filename string, content string) error {
+	return WriteFileBytes(filename, StringToBytes(content))
+}
+
+// 写文件（指定目录不存在时先创建，不含目录时存当前目录）
+func WriteFileBytes(filename string, data []byte) error {
+	os.MkdirAll(filepath.Dir(filename), 0777)
+	return os.WriteFile(filename, data, 0666)
 }
