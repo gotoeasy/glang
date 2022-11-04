@@ -5,12 +5,13 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"os"
 )
 
 // 使用公钥进行RSA加密后按Base64编码字符串
-func EncodeRsa(str string, pubKeyFileName string) (string, error) {
-	bt, err := EncodeRsaBytes(StringToBytes(str), pubKeyFileName)
+func EncodeRsa(str string, pubKey string) (string, error) {
+	bt, err := EncodeRsaBytes(StringToBytes(str), StringToBytes(pubKey))
 	if err != nil {
 		return "", err
 	}
@@ -18,12 +19,34 @@ func EncodeRsa(str string, pubKeyFileName string) (string, error) {
 }
 
 // 按Base64解码字符串后使用私钥进行RSA解密
-func DecodeRsa(str string, pubKeyFileName string) (string, error) {
+func DecodeRsa(str string, priKey string) (string, error) {
 	by, err := Base64Decode(str)
 	if err != nil {
 		return "", err
 	}
-	bt, err := DecodeRsaBytes(by, pubKeyFileName)
+	bt, err := DecodeRsaBytes(by, StringToBytes(priKey))
+	if err != nil {
+		return "", err
+	}
+	return BytesToString(bt), nil
+}
+
+// 使用公钥文件进行RSA加密后按Base64编码字符串
+func EncodeRsaByPubFile(str string, pubKeyFileName string) (string, error) {
+	bt, err := EncodeRsaBytesByPubFile(StringToBytes(str), pubKeyFileName)
+	if err != nil {
+		return "", err
+	}
+	return Base64(bt), nil
+}
+
+// 按Base64解码字符串后使用私钥文件进行RSA解密
+func DecodeRsaByPriFile(str string, pubKeyFileName string) (string, error) {
+	by, err := Base64Decode(str)
+	if err != nil {
+		return "", err
+	}
+	bt, err := DecodeRsaBytesByPriFile(by, pubKeyFileName)
 	if err != nil {
 		return "", err
 	}
@@ -35,8 +58,8 @@ func GenerateRsaKey() error {
 	return GenerateRsaKeyFile(2048, "rsa_private.pem", "rsa_public.pem")
 }
 
-// 使用公钥进行RSA加密
-func EncodeRsaBytes(data []byte, pubKeyFileName string) ([]byte, error) {
+// 使用公钥文件进行RSA加密
+func EncodeRsaBytesByPubFile(data []byte, pubKeyFileName string) ([]byte, error) {
 	file, err := os.Open(pubKeyFileName)
 	if err != nil {
 		return nil, err
@@ -49,23 +72,11 @@ func EncodeRsaBytes(data []byte, pubKeyFileName string) ([]byte, error) {
 	buf := make([]byte, fileInfo.Size())
 	file.Read(buf)
 
-	block, _ := pem.Decode(buf)
-
-	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	pubKey := pubInterface.(*rsa.PublicKey)
-
-	cipherTextBytes, err := rsa.EncryptPKCS1v15(rand.Reader, pubKey, data)
-	if err != nil {
-		return nil, err
-	}
-	return cipherTextBytes, nil
+	return EncodeRsaBytes(data, buf)
 }
 
-// 使用私钥进行RSA解密
-func DecodeRsaBytes(data []byte, privateKeyFileName string) ([]byte, error) {
+// 使用私钥文件进行RSA解密
+func DecodeRsaBytesByPriFile(data []byte, privateKeyFileName string) ([]byte, error) {
 	file, err := os.Open(privateKeyFileName)
 	if err != nil {
 		return nil, err
@@ -78,59 +89,75 @@ func DecodeRsaBytes(data []byte, privateKeyFileName string) ([]byte, error) {
 	defer file.Close()
 	file.Read(buf)
 
-	block, _ := pem.Decode(buf)
-
-	priKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return rsa.DecryptPKCS1v15(rand.Reader, priKey, data)
+	return DecodeRsaBytes(data, buf)
 }
 
 // 创建秘钥文件（keySize通常是1024、2048、4096）
 func GenerateRsaKeyFile(keySize int, priKeyFile, pubKeyFile string) error {
-	// private key
-	privateKey, err := rsa.GenerateKey(rand.Reader, keySize)
+	pri, pub, err := GenerateRSAKey(keySize)
 	if err != nil {
 		return err
 	}
 
-	derText := x509.MarshalPKCS1PrivateKey(privateKey)
-
-	block := pem.Block{
-		Type:  "rsa private key",
-		Bytes: derText,
-	}
-
-	file, err := os.Create(priKeyFile)
-	if err != nil {
-		return err
-	}
-
-	pem.Encode(file, &block)
-	file.Close()
-
-	// public key
-	publicKey := privateKey.PublicKey
-
-	derpText, err := x509.MarshalPKIXPublicKey(&publicKey)
-	if err != nil {
-		return err
-	}
-
-	block = pem.Block{
-		Type:  "rsa public key",
-		Bytes: derpText,
-	}
-
-	//file,err = os.Create("rsa_public.pem")
-	file, err = os.Create(pubKeyFile)
-	if err != nil {
-		return err
-	}
-	pem.Encode(file, &block)
-	file.Close()
-
+	os.WriteFile(priKeyFile, pri, 0666)
+	os.WriteFile(pubKeyFile, pub, 0666)
 	return nil
+}
+
+// 创建秘钥
+func GenerateRSAKey(keySize int) (privateKey []byte, publicKey []byte, err error) {
+	prvKey, err := rsa.GenerateKey(rand.Reader, keySize)
+	if err != nil {
+		return
+	}
+
+	pkixb, err := x509.MarshalPKIXPublicKey(&prvKey.PublicKey)
+	if err != nil {
+		return
+	}
+
+	privateKey = pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(prvKey),
+	})
+	publicKey = pem.EncodeToMemory(&pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: pkixb,
+	})
+	return
+}
+
+// 使用公钥加密
+func EncodeRsaBytes(data []byte, publicKey []byte) ([]byte, error) {
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return nil, errors.New("无效的公钥")
+	}
+
+	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	key, ok := pubKey.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("无效的公钥")
+	}
+
+	return rsa.EncryptPKCS1v15(rand.Reader, key, data)
+}
+
+// 使用秘钥解密
+func DecodeRsaBytes(cipherText, privateKey []byte) ([]byte, error) {
+	block, _ := pem.Decode(privateKey)
+	if block == nil {
+		return nil, errors.New("无效的秘钥")
+	}
+
+	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return rsa.DecryptPKCS1v15(rand.Reader, key, cipherText)
 }

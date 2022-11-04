@@ -7,20 +7,40 @@ import (
 )
 
 func Test_rsa(t *testing.T) {
+
 	err := GenerateRsaKeyFile(2048, "f:/pri.pem", "f:/pub.pem")
 	if err != nil {
 		Error(err)
 	}
 
 	src := "公钥加密则私钥解密，私钥加密则公钥解密，本包只支持公钥加密私钥解密。公钥是公开的，私钥自己持有，通常私钥用于解密才具备秘钥的意义。"
-	encodeStr, err := EncodeRsa(src, "f:/pub.pem")
+	encodeStr, err := EncodeRsaByPubFile(src, "f:/pub.pem")
 	if err != nil {
 		Error(err)
 	} else {
 		Info(encodeStr)
 	}
 
-	str, err := DecodeRsa(encodeStr, "f:/pri.pem")
+	str, err := DecodeRsaByPriFile(encodeStr, "f:/pri.pem")
+	if err != nil {
+		Error(err)
+	} else {
+		Info(str)
+	}
+
+	// 非文件方式
+	byPri, byPub, err := GenerateRSAKey(2048)
+	if err != nil {
+		Error(err)
+	}
+	encodeStr, err = EncodeRsa(src, BytesToString(byPub))
+	if err != nil {
+		Error(err)
+	} else {
+		Info(encodeStr)
+	}
+
+	str, err = DecodeRsa(encodeStr, BytesToString(byPri))
 	if err != nil {
 		Error(err)
 	} else {
