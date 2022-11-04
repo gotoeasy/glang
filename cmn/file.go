@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"io"
 	"os"
 	"path"
 )
@@ -36,4 +37,36 @@ func IsExistDir(dir string) bool {
 		return false
 	}
 	return s.IsDir()
+}
+
+// 删除文件或目录(含全部子目录文件)
+func RemoveAllFile(pathorfile string) error {
+	return os.RemoveAll(pathorfile)
+}
+
+// 复制文件
+func CopyFile(srcFilePath string, dstFilePath string) error {
+	srcFile, err := os.Open(srcFilePath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	distFile, err := os.Create(dstFilePath)
+	if err != nil {
+		return err
+	}
+	defer distFile.Close()
+
+	var tmp = make([]byte, 1024*4)
+	for {
+		n, err := srcFile.Read(tmp)
+		distFile.Write(tmp[:n])
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+	}
 }
