@@ -5,23 +5,7 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
-	"unsafe"
 )
-
-// string 转 []byte
-func StringToBytes(s string) []byte {
-	return *(*[]byte)(unsafe.Pointer(
-		&struct {
-			string
-			Cap int
-		}{s, len(s)},
-	))
-}
-
-// []byte 转 string
-func BytesToString(b []byte) string {
-	return *(*string)(unsafe.Pointer(&b))
-}
 
 // 按文字计算字符串长度
 func Len(str string) int {
