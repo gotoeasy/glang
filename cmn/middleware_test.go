@@ -17,4 +17,14 @@ func Test_redis6(t *testing.T) {
 	rd.Set("abc", "vvvvvvvvvvvvv", time.Minute)
 	v, err := rd.Get("abc")
 	Info(v, err)
+
+	i := rd.Exists("abc")
+	Info(i)
+
+	rd.Del("abc")
+	v, err = rd.Get("abc")
+	Info(v, err)
+
+	i2 := rd.Exists("abc")
+	Info(i2)
 }

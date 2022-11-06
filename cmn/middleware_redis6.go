@@ -33,8 +33,9 @@ func (r *Redis6Client) Del(key string) error {
 }
 
 // 判断是否存在
-func (r *Redis6Client) Exists(key string) *redis.IntCmd {
-	return r.rdb.Exists(r.ctx, key)
+func (r *Redis6Client) Exists(key string) bool {
+	ic := r.rdb.Exists(r.ctx, key)
+	return ic.Val() > 0
 }
 
 // 获取（空时也是error，可通过err==redis.Nil判断）
