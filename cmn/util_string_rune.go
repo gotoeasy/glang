@@ -177,3 +177,16 @@ func Split(str string, sep string) []string {
 func Join(elems []string, sep string) string {
 	return strings.Join(elems, sep)
 }
+
+// 字符串去重
+func Unique(strs []string) []string {
+	m := make(map[string]struct{}, 0)
+	newS := make([]string, 0)
+	for _, i2 := range strs {
+		if _, ok := m[i2]; !ok {
+			newS = append(newS, i2)
+			m[i2] = struct{}{}
+		}
+	}
+	return newS
+}
