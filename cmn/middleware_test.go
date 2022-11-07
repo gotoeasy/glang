@@ -28,3 +28,16 @@ func Test_redis6(t *testing.T) {
 	i2 := rd.Exists("abc")
 	Info(i2)
 }
+
+func Test_leveldb(t *testing.T) {
+	ldb := NewLevelDB("f:\\222\\ldbtest", nil)
+	ldb.Put(StringToBytes("key"), StringToBytes("value"))
+
+	by, err := ldb.Get(StringToBytes("key"))
+	Info(BytesToString(by), err)
+
+	// New多次也还是同一个客户端
+	ldb = NewLevelDB("f:\\222\\ldbtest", nil)
+	by, err = ldb.Get(StringToBytes("key"))
+	Info(BytesToString(by), err)
+}
