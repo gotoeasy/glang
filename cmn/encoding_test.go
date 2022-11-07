@@ -4,7 +4,26 @@ import (
 	"fmt"
 	"log"
 	"testing"
+	"time"
 )
+
+func Test_jwt(t *testing.T) {
+	j := NewJWT("kkkkkkkkkdsadsakkk")
+	kv := NewMapString().Put("user", "ssssssss").Put("group", "xxxxxxxxxx")
+	tk, err := j.CreateToken(kv, -9) // 创建马上超时的令牌
+	Info(tk, err)
+
+	Info(j.Parse(tk))
+	Info(j.Validate(tk))
+	Info(j.IsExpired(tk))
+
+	// 续签令牌
+	tk, err = j.ExpandToken(tk, 5*time.Minute) // 续签5分钟超时的令牌
+	Info(tk, err)
+	Info(j.Parse(tk))
+	Info(j.Validate(tk))
+	Info(j.IsExpired(tk))
+}
 
 func Test_rsa(t *testing.T) {
 
