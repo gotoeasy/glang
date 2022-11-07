@@ -21,6 +21,11 @@ func Int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
 }
 
+// uint64 转 string
+func Uint64ToString(i uint64) string {
+	return strconv.FormatUint(i, 10)
+}
+
 // int 转 string
 func IntToString(i int) string {
 	return strconv.Itoa(i)
