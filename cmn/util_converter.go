@@ -43,6 +43,13 @@ func IntToBytes(intNum int) []byte {
 	return bytebuf.Bytes()
 }
 
+// int64 转 []byte
+func Int64ToBytes(i int64) []byte {
+	bkey := make([]byte, 8)
+	binary.BigEndian.PutUint64(bkey, uint64(i))
+	return bkey
+}
+
 // uint32 转 string
 func Uint32ToString(num uint32) string {
 	return BytesToString(Uint32ToBytes(num))
