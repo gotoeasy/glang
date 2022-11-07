@@ -16,6 +16,11 @@ func StringToInt(s string, defaultVal int) int {
 	return v
 }
 
+// float64 转 int64
+func Float64ToInt64(f float64) int64 {
+	return int64(f)
+}
+
 // int64 转 string
 func Int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
