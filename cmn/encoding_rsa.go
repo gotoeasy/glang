@@ -53,7 +53,7 @@ func DecodeRsaByPriFile(str string, pubKeyFileName string) (string, error) {
 	return BytesToString(bt), nil
 }
 
-// 当前目录下创建4096位的秘钥文件"rsa_private.pem、rsa_public.pem"
+// 当前目录下创建2048位的秘钥文件"rsa_private.pem、rsa_public.pem"
 func GenerateRsaKey() error {
 	return GenerateRsaKeyFile(2048, "rsa_private.pem", "rsa_public.pem")
 }
