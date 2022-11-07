@@ -122,3 +122,11 @@ func StringToBool(s string, defaultVal bool) bool {
 	}
 	return defaultVal
 }
+
+// bool 转 string
+func BoolToString(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}
