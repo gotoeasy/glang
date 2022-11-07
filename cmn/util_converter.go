@@ -32,10 +32,10 @@ func StringToUint32(s string, defaultVal uint32) uint32 {
 
 // int 转 []byte
 func IntToBytes(intNum int) []byte {
-	uint16Num := uint16(intNum)
-	buf := bytes.NewBuffer([]byte{})
-	binary.Write(buf, binary.LittleEndian, uint16Num)
-	return buf.Bytes()
+	data := int64(intNum)
+	bytebuf := bytes.NewBuffer([]byte{})
+	binary.Write(bytebuf, binary.BigEndian, data)
+	return bytebuf.Bytes()
 }
 
 // uint32 转 string
