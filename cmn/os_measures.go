@@ -9,6 +9,17 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
+// 检测CPU、内存、磁盘使用占比
+func MeasureSummary() (cpuUsedPercent float64, memUsedPercent float64, diskUsedPercent float64) {
+	_, _, cpuUsedPercent = MeasureCPU()
+	_, _, _, memUsedPercent = MeasureMemory()
+	_, _, _, diskUsedPercent = MeasureDisk()
+	cpuUsedPercent = Round1(cpuUsedPercent)
+	memUsedPercent = Round1(memUsedPercent)
+	diskUsedPercent = Round1(diskUsedPercent)
+	return
+}
+
 // 检测内存
 func MeasureMemory() (total uint64, used uint64, free uint64, usePercent float64) {
 	v, _ := mem.VirtualMemory()
