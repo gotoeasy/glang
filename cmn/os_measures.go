@@ -28,7 +28,7 @@ func MeasureCPU() (physicalCount int, logicalCount int, usePercent float64) {
 }
 
 // 检测磁盘(当前盘)
-func MeasureDisk0() (total uint64, used uint64, free uint64, usePercent float64) {
+func MeasureDisk() (total uint64, used uint64, free uint64, usePercent float64) {
 	parts, _ := disk.Partitions(false)
 	diskInfo, _ := disk.Usage(parts[0].Mountpoint)
 	total = diskInfo.Total
@@ -36,4 +36,15 @@ func MeasureDisk0() (total uint64, used uint64, free uint64, usePercent float64)
 	free = diskInfo.Free
 	usePercent = diskInfo.UsedPercent
 	return
+}
+
+// 检测所有磁盘
+func MeasureDisks() []*disk.UsageStat {
+	parts, _ := disk.Partitions(true)
+	var diskInfos []*disk.UsageStat
+	for _, part := range parts {
+		diskInfo, _ := disk.Usage(part.Mountpoint)
+		diskInfos = append(diskInfos, diskInfo)
+	}
+	return diskInfos
 }

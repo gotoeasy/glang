@@ -16,7 +16,7 @@ func Test_os_mem(t *testing.T) {
 	physicalCount, logicalCount, cpuPercent := MeasureCPU()
 	Info("物理CPU核数", physicalCount, "，逻辑CPU核数", logicalCount, "，使用占比", fmt.Sprintf("%.1f%%", cpuPercent))
 
-	total, used, free, diskPercent := MeasureDisk0()
+	total, used, free, diskPercent := MeasureDisk()
 	Info("磁盘总容量", total, "，已使用", used, "，空余", free, "，使用占比", fmt.Sprintf("%.1f%%", diskPercent))
 
 }
