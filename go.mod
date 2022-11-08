@@ -5,10 +5,12 @@ go 1.19
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 )
 
 require (
+	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -37,6 +39,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/valyala/fasthttp v1.41.0
+	github.com/wangbin/jiebago v0.3.2
 	golang.org/x/image v0.1.0
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 )
