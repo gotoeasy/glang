@@ -10,3 +10,10 @@ func Test_sego(t *testing.T) {
 	ws := seg.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错")
 	Info(ws)
 }
+
+func Test_jiebago(t *testing.T) {
+
+	seg := NewTokenizerJiebago("")
+	ws := seg.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错")
+	Info(ws)
+}
