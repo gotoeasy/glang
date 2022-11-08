@@ -71,7 +71,7 @@ func NewLevelDB(dbPath string, opt *OptionLevelDB) *LevelDB {
 func (s *LevelDB) Put(key []byte, value []byte) error {
 	s.lastTime = time.Now().Unix()
 	if !s.opened {
-		s.open() // 自动打开数据库
+		s.Open() // 自动打开数据库
 	}
 	return s.leveldb.Put(key, value, nil)
 }
@@ -80,7 +80,7 @@ func (s *LevelDB) Put(key []byte, value []byte) error {
 func (s *LevelDB) Del(key []byte) error {
 	s.lastTime = time.Now().Unix()
 	if !s.opened {
-		s.open() // 自动打开数据库
+		s.Open() // 自动打开数据库
 	}
 	return s.leveldb.Delete(key, nil)
 }
@@ -89,7 +89,7 @@ func (s *LevelDB) Del(key []byte) error {
 func (s *LevelDB) Get(key []byte) ([]byte, error) {
 	s.lastTime = time.Now().Unix()
 	if !s.opened {
-		s.open() // 自动打开数据库
+		s.Open() // 自动打开数据库
 	}
 	return s.leveldb.Get(key, nil)
 }
@@ -98,7 +98,7 @@ func (s *LevelDB) Get(key []byte) ([]byte, error) {
 func (s *LevelDB) GetSnapshot() (*leveldb.Snapshot, error) {
 	s.lastTime = time.Now().Unix()
 	if !s.opened {
-		s.open() // 自动打开数据库
+		s.Open() // 自动打开数据库
 	}
 	return s.leveldb.GetSnapshot()
 }
@@ -109,7 +109,7 @@ func (s *LevelDB) autoCloseWhenMaxIdle() {
 		for {
 			<-ticker.C
 			if time.Now().Unix()-s.lastTime > s.maxIdleSecond {
-				s.close()
+				s.Close()
 				ticker.Stop()
 				break
 			}
@@ -118,7 +118,7 @@ func (s *LevelDB) autoCloseWhenMaxIdle() {
 }
 
 // 打开数据库
-func (s *LevelDB) open() error {
+func (s *LevelDB) Open() error {
 	s.lastTime = time.Now().Unix()
 	if s.opened {
 		return nil
@@ -147,7 +147,7 @@ func (s *LevelDB) open() error {
 }
 
 // 关闭数据库
-func (s *LevelDB) close() {
+func (s *LevelDB) Close() {
 	if !s.opened {
 		return
 	}
