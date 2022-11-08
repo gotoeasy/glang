@@ -85,6 +85,9 @@ func SubString(str string, start int, end int) string {
 // 查找文字下标
 func IndexOf(str string, substr string) int {
 	idx := strings.Index(str, substr)
+	if idx < 0 {
+		return idx
+	}
 	return utf8.RuneCountInString(str[:idx])
 }
 
