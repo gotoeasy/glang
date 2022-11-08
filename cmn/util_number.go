@@ -1,7 +1,9 @@
 package cmn
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -36,4 +38,28 @@ func AbsInt64(a int64) int64 {
 		return -a
 	}
 	return a
+}
+
+// 四舍五入保留指定位数(0-16)的小数
+func Round(num float64, digit int) float64 {
+	if digit < 0 {
+		digit = 0
+	}
+	if digit > 16 {
+		digit = 16
+	}
+	rs, _ := strconv.ParseFloat(fmt.Sprintf("%."+IntToString(digit)+"f", num), 64)
+	return rs
+}
+
+// 四舍五入保留1位小数
+func Round1(num float64) float64 {
+	rs, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
+	return rs
+}
+
+// 四舍五入保留2位小数
+func Round2(num float64) float64 {
+	rs, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
+	return rs
 }
