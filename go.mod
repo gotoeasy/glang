@@ -8,6 +8,7 @@ require (
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
 	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/shopspring/decimal v1.3.1
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 )
 
