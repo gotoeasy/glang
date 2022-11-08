@@ -5,12 +5,23 @@ import (
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
 // 检测内存
 func MeasureMemory() (total uint64, used uint64, free uint64, usePercent float64) {
 	v, _ := mem.VirtualMemory()
+	total = v.Total
+	used = v.Total - v.Free
+	free = v.Free
+	usePercent = v.UsedPercent
+	return
+}
+
+// 检测虚拟内存
+func MeasureSwap() (total uint64, used uint64, free uint64, usePercent float64) {
+	v, _ := mem.SwapMemory()
 	total = v.Total
 	used = v.Total - v.Free
 	free = v.Free
@@ -47,4 +58,9 @@ func MeasureDisks() []*disk.UsageStat {
 		diskInfos = append(diskInfos, diskInfo)
 	}
 	return diskInfos
+}
+
+// 检测主机信息
+func MeasureHost() (*host.InfoStat, error) {
+	return host.Info()
 }
