@@ -54,7 +54,7 @@ func Round(num float64, digit int) float64 {
 
 // 四舍五入保留1位小数
 func Round1(num float64) float64 {
-	rs, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", num), 64)
+	rs, _ := strconv.ParseFloat(fmt.Sprintf("%.1f", num), 64)
 	return rs
 }
 
