@@ -13,3 +13,8 @@ func Today() string {
 func GetYyyymmdd(addDays int) string {
 	return time.Now().AddDate(0, 0, addDays).Format("20060102")
 }
+
+// 系统时间的yyyymmdd HH:MM:SS格式
+func GetYyyymmddHHMMSS() string {
+	return time.Now().Format("20060102 15:04:05")
+}
