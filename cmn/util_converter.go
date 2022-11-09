@@ -7,9 +7,18 @@ import (
 	"unsafe"
 )
 
-// 字符串(10进制无符号整数形式)转int，超过int最大值会丢失精度，转换失败时返回默认值
+// string 转 int
 func StringToInt(s string, defaultVal int) int {
 	v, err := strconv.Atoi(s)
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
+// string 转 float64
+func String2Float64(s string, defaultVal float64) float64 {
+	v, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		return defaultVal
 	}
