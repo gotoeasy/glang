@@ -30,6 +30,16 @@ func Test_redis6(t *testing.T) {
 }
 
 func Test_leveldb(t *testing.T) {
+
+	// 开启日志发送GLC
+	SetLogCenterClient(NewGLogCenterClient(&GlcOptions{
+		Url:      GetEnvStr("GLC_API_URL", "http://glc.lanzhz.com/glc/v1/log/add"),
+		System:   GetEnvStr("GLC_SYSTEM", "glang/cmn"),
+		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
+		Enable:   GetEnvBool("GLC_ENABLE", true),
+		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "trace"),
+	}))
+
 	ldb := NewLevelDB("f:\\222\\ldbtest", nil)
 	ldb.Put(StringToBytes("key"), StringToBytes("value"))
 
@@ -40,4 +50,9 @@ func Test_leveldb(t *testing.T) {
 	ldb = NewLevelDB("f:\\222\\ldbtest", nil)
 	by, err = ldb.Get(StringToBytes("key"))
 	Info(BytesToString(by), err)
+
+	ldb.Close()
+
+	// 日志异步发送GLC，休眠下，让日志飞一会
+	time.Sleep(time.Second * 3)
 }
