@@ -18,7 +18,7 @@ func Test_jwt(t *testing.T) {
 	Info(j.IsExpired(tk))
 
 	// 续签令牌
-	tk, err = j.ExpandToken(tk, 5*time.Minute) // 续签5分钟超时的令牌
+	tk, err = j.RefreshToken(tk, 5*time.Minute) // 续签5分钟超时的令牌
 	Info(tk, err)
 	Info(j.Parse(tk))
 	Info(j.Validate(tk))
