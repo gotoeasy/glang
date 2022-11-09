@@ -1,10 +1,15 @@
 package cmn
 
-import "strings"
+import (
+	"strings"
+)
 
 // 日志中心客户端结构体
 type GLogCenterClient struct {
-	opt *GlcOptions
+	url    string
+	system string
+	apiKey string
+	enable bool
 }
 
 // 日志中心选项
@@ -20,15 +25,16 @@ func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
 	if o == nil {
 		o = &GlcOptions{}
 	}
-	return &GLogCenterClient{opt: o}
+	return &GLogCenterClient{
+		url:    o.Url,
+		system: o.System,
+		apiKey: o.ApiKey,
+		enable: o.Enable,
+	}
 }
 
 // 发送日志到日志中心
 func (g *GLogCenterClient) PostLog(text string) {
-	if !g.opt.Enable {
-		return
-	}
-
 	text = Trim(text)
 	if text == "" {
 		return
@@ -36,12 +42,12 @@ func (g *GLogCenterClient) PostLog(text string) {
 
 	var data strings.Builder
 	data.WriteString("{")
-	data.WriteString(`"system":"` + g.encodeGlcJsonValue(g.opt.System) + `"`)
+	data.WriteString(`"system":"` + g.encodeGlcJsonValue(g.system) + `"`)
 	data.WriteString(`,"date":"` + GetYyyymmddHHMMSS() + `"`)
 	data.WriteString(`,"text":"` + g.encodeGlcJsonValue(text) + `"`)
 	data.WriteString("}")
 
-	FasthttpPostJson(g.opt.Url, data.String(), g.opt.ApiKey)
+	FasthttpPostJson(g.url, data.String(), g.apiKey)
 }
 
 func (g *GLogCenterClient) encodeGlcJsonValue(v string) string {
