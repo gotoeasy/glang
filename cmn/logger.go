@@ -1,10 +1,21 @@
 package cmn
 
 import (
+	"fmt"
 	"log"
 )
 
 var logLevel int
+var glc *GLogCenterClient
+
+func init() {
+	glc = NewGLogCenterClient(&GlcOptions{
+		Url:    GetEnvStr("GLC_API_URL", ""),
+		System: GetEnvStr("GLC_SYSTEM", "default"),
+		ApiKey: GetEnvStr("GLC_API_KEY", ""),
+		Enable: GetEnvBool("GLC_ENABLE", false),
+	})
+}
 
 // 设定日志级别（trace/debug/info/warn/error/fatal）
 func SetLogLevel(level string) {
@@ -26,51 +37,66 @@ func SetLogLevel(level string) {
 // 打印Trace级别日志
 func Trace(v ...any) {
 	if logLevel <= 0 {
-		log.Println(append([]any{"TRACE"}, v...)...)
+		v = append([]any{"TRACE"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Debug级别日志
 func Debug(v ...any) {
 	if logLevel <= 1 {
-		log.Println(append([]any{"DEBUG"}, v...)...)
+		v = append([]any{"DEBUG"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Info级别日志
 func Info(v ...any) {
 	if logLevel <= 2 {
-		log.Println(append([]any{"INFO"}, v...)...)
+		v = append([]any{"INFO"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Warn级别日志
 func Warn(v ...any) {
 	if logLevel <= 3 {
-		log.Println(append([]any{"WARN"}, v...)...)
+		v = append([]any{"WARN"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Error级别日志
 func Error(v ...any) {
 	if logLevel <= 4 {
-		log.Println(append([]any{"ERROR"}, v...)...)
+		v = append([]any{"ERROR"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Fatal级别日志
 func Fatal(v ...any) {
 	if logLevel <= 5 {
-		log.Fatalln(append([]any{"FATAL"}, v...)...)
+		v = append([]any{"FATAL"}, v...)
+		log.Println(v...)
+		go glc.PostLog(fmt.Sprint(v...))
 	}
 }
 
 // 打印Fatal级别日志，然后退出
 func Fatalln(v ...any) {
-	log.Fatalln(append([]any{"FATAL"}, v...)...)
+	v = append([]any{"FATAL"}, v...)
+	go glc.PostLog(fmt.Sprint(v...))
+	log.Fatalln(v...)
 }
 
 // 打印日志
 func Println(v ...any) {
 	log.Println(v...)
+	go glc.PostLog(fmt.Sprint(v...))
 }
