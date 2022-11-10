@@ -75,3 +75,8 @@ func FormatDate(date time.Time, fmt DateFormat) string {
 func FormatSystemDate(fmt DateFormat) string {
 	return FormatDate(time.Now(), fmt)
 }
+
+// 指定格式的字符串转日期
+func ParseDate(date string, fmt DateFormat) (time.Time, error) {
+	return time.Parse(string(fmt), date)
+}
