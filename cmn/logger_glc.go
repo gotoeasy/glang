@@ -89,7 +89,7 @@ func (g *GLogCenterClient) Trace(v ...any) {
 
 // 发送指定系统名的Trace级别日志到日志中心
 func (g *GLogCenterClient) TraceSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
+	if glc.enable && glc.logLevel <= 0 {
 		g.print(system, "TRACE "+fmt.Sprint(v...))
 	}
 }
@@ -117,7 +117,7 @@ func (g *GLogCenterClient) Info(v ...any) {
 
 // 发送指定系统名的Info级别日志到日志中心
 func (g *GLogCenterClient) InfoSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
+	if glc.enable && glc.logLevel <= 2 {
 		g.print(system, "INFO "+fmt.Sprint(v...))
 	}
 }
@@ -131,7 +131,7 @@ func (g *GLogCenterClient) Warn(v ...any) {
 
 // 发送指定系统名的Warn级别日志到日志中心
 func (g *GLogCenterClient) WarnSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
+	if glc.enable && glc.logLevel <= 3 {
 		g.print(system, "WARN "+fmt.Sprint(v...))
 	}
 }
@@ -145,7 +145,7 @@ func (g *GLogCenterClient) Error(v ...any) {
 
 // 发送指定系统名的Error级别日志到日志中心
 func (g *GLogCenterClient) ErrorSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
+	if glc.enable && glc.logLevel <= 4 {
 		g.print(system, "ERROR "+fmt.Sprint(v...))
 	}
 }
