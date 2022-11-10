@@ -33,10 +33,10 @@ func Test_leveldb(t *testing.T) {
 
 	// 开启日志发送GLC
 	SetLogCenterClient(NewGLogCenterClient(&GlcOptions{
-		Url:      GetEnvStr("GLC_API_URL", "http://glc.lanzhz.com/glc/v1/log/add"),
+		ApiUrl:   GetEnvStr("GLC_API_URL", "http://glc.nnn.com/glc/v1/log/add"),
 		System:   GetEnvStr("GLC_SYSTEM", "glang/cmn"),
 		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
-		Enable:   GetEnvBool("GLC_ENABLE", true),
+		Enable:   GetEnvBool("GLC_ENABLE", false),
 		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "trace"),
 	}))
 

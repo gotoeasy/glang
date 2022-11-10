@@ -6,8 +6,10 @@ import (
 )
 
 // 日志中心客户端结构体
+//
+// 日志中心见 https://github.com/gotoeasy/glogcenter
 type GLogCenterClient struct {
-	url      string
+	apiUrl   string
 	system   string
 	apiKey   string
 	enable   bool
@@ -17,11 +19,24 @@ type GLogCenterClient struct {
 
 // 日志中心选项
 type GlcOptions struct {
-	Url      string
-	System   string
-	ApiKey   string
-	Enable   bool
-	LogLevel string
+	ApiUrl   string // 日志中心的添加日志接口地址
+	System   string // 系统名（对应日志中心检索页面的分类栏）
+	ApiKey   string // 日志中心的ApiKey
+	Enable   bool   // 是否开启发送到日志中心
+	LogLevel string // 日志级别（trace/debug/info/warn/error/fatal）
+}
+
+var glc *GLogCenterClient
+
+// 按环境编配配置初始化glc对象，方便开箱即用，外部使用时可通过SetLogCenterClient重新设定
+func init() {
+	SetLogCenterClient(NewGLogCenterClient(&GlcOptions{
+		ApiUrl:   GetEnvStr("GLC_API_URL", ""),
+		System:   GetEnvStr("GLC_SYSTEM", "glang"),
+		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
+		Enable:   GetEnvBool("GLC_ENABLE", false),
+		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "debug"),
+	}))
 }
 
 // 创建日志中心客户端对象
@@ -31,7 +46,7 @@ func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
 	}
 
 	glc := &GLogCenterClient{
-		url:     o.Url,
+		apiUrl:  o.ApiUrl,
 		system:  o.System,
 		apiKey:  o.ApiKey,
 		enable:  o.Enable,
@@ -53,63 +68,114 @@ func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
 	go func() {
 		for {
 			text := <-glc.logChan
-			FasthttpPostJson(glc.url, text, glc.apiKey)
+			FasthttpPostJson(glc.apiUrl, text, glc.apiKey)
 		}
 	}()
 
 	return glc
 }
 
+// 设定GLC日志中心客户端
+func SetLogCenterClient(glcClient *GLogCenterClient) {
+	glc = glcClient
+}
+
 // 发送Trace级别日志到日志中心
 func (g *GLogCenterClient) Trace(v ...any) {
 	if glc.enable && glc.logLevel <= 0 {
-		g.SentLog("TRACE " + fmt.Sprint(v...))
+		g.Println("TRACE " + fmt.Sprint(v...))
+	}
+}
+
+// 发送指定系统名的Trace级别日志到日志中心
+func (g *GLogCenterClient) TraceSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 5 {
+		g.print(system, "TRACE "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Debug级别日志到日志中心
 func (g *GLogCenterClient) Debug(v ...any) {
 	if glc.enable && glc.logLevel <= 1 {
-		g.SentLog("DEBUG " + fmt.Sprint(v...))
+		g.Println("DEBUG " + fmt.Sprint(v...))
+	}
+}
+
+// 发送Debug级别日志到日志中心
+func (g *GLogCenterClient) DebugSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 1 {
+		g.Println("DEBUG " + fmt.Sprint(v...))
 	}
 }
 
 // 发送Info级别日志到日志中心
 func (g *GLogCenterClient) Info(v ...any) {
 	if glc.enable && glc.logLevel <= 2 {
-		g.SentLog("INFO " + fmt.Sprint(v...))
+		g.Println("INFO " + fmt.Sprint(v...))
+	}
+}
+
+// 发送指定系统名的Info级别日志到日志中心
+func (g *GLogCenterClient) InfoSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 5 {
+		g.print(system, "INFO "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Warn级别日志到日志中心
 func (g *GLogCenterClient) Warn(v ...any) {
 	if glc.enable && glc.logLevel <= 3 {
-		g.SentLog("WARN " + fmt.Sprint(v...))
+		g.Println("WARN " + fmt.Sprint(v...))
+	}
+}
+
+// 发送指定系统名的Warn级别日志到日志中心
+func (g *GLogCenterClient) WarnSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 5 {
+		g.print(system, "WARN "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Error级别日志到日志中心
 func (g *GLogCenterClient) Error(v ...any) {
 	if glc.enable && glc.logLevel <= 4 {
-		g.SentLog("ERROR " + fmt.Sprint(v...))
+		g.Println("ERROR " + fmt.Sprint(v...))
+	}
+}
+
+// 发送指定系统名的Error级别日志到日志中心
+func (g *GLogCenterClient) ErrorSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 5 {
+		g.print(system, "ERROR "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Fatal级别日志到日志中心
 func (g *GLogCenterClient) Fatal(v ...any) {
 	if glc.enable && glc.logLevel <= 5 {
-		g.SentLog("FATAL " + fmt.Sprint(v...))
+		g.Println("FATAL " + fmt.Sprint(v...))
 	}
 }
 
-// 发送指定级别日志到日志中心
-func (g *GLogCenterClient) SentLog(text string) {
+// 发送指定系统名的Fatal级别日志到日志中心
+func (g *GLogCenterClient) FatalSys(system string, v ...any) {
+	if glc.enable && glc.logLevel <= 5 {
+		g.print(system, "FATAL "+fmt.Sprint(v...))
+	}
+}
+
+// 发送日志到日志中心
+func (g *GLogCenterClient) Println(text string) {
+	g.print(g.system, text)
+}
+
+func (g *GLogCenterClient) print(system string, text string) {
 	if IsBlank(text) {
 		return
 	}
 	var data strings.Builder
 	data.WriteString("{")
-	data.WriteString(`"system":"` + g.encodeGlcJsonValue(g.system) + `"`)
+	data.WriteString(`"system":"` + g.encodeGlcJsonValue(system) + `"`)
 	data.WriteString(`,"date":"` + FormatSystemDate(FMT_YYYY_MM_DD_HH_MM_SS_SSS) + `"`)
 	data.WriteString(`,"text":"` + g.encodeGlcJsonValue(text) + `"`)
 	data.WriteString("}")

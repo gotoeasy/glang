@@ -6,12 +6,6 @@ import (
 )
 
 var logLevel int
-var glc *GLogCenterClient
-
-// 设定GLC日志中心客户端
-func SetLogCenterClient(glcClient *GLogCenterClient) {
-	glc = glcClient
-}
 
 // 设定日志级别（trace/debug/info/warn/error/fatal）
 func SetLogLevel(level string) {
@@ -32,9 +26,7 @@ func SetLogLevel(level string) {
 
 // 打印Trace级别日志
 func Trace(v ...any) {
-	if glc != nil {
-		glc.Trace(v...)
-	}
+	glc.Trace(v...)
 	if logLevel <= 0 {
 		log.Println(append([]any{"TRACE"}, v...)...)
 	}
@@ -42,9 +34,7 @@ func Trace(v ...any) {
 
 // 打印Debug级别日志
 func Debug(v ...any) {
-	if glc != nil {
-		glc.Debug(v...)
-	}
+	glc.Debug(v...)
 	if logLevel <= 1 {
 		log.Println(append([]any{"DEBUG"}, v...)...)
 	}
@@ -52,9 +42,7 @@ func Debug(v ...any) {
 
 // 打印Info级别日志
 func Info(v ...any) {
-	if glc != nil {
-		glc.Info(v...)
-	}
+	glc.Info(v...)
 	if logLevel <= 2 {
 		log.Println(append([]any{"INFO"}, v...)...)
 	}
@@ -62,9 +50,7 @@ func Info(v ...any) {
 
 // 打印Warn级别日志
 func Warn(v ...any) {
-	if glc != nil {
-		glc.Warn(v...)
-	}
+	glc.Warn(v...)
 	if logLevel <= 3 {
 		log.Println(append([]any{"WARN"}, v...)...)
 	}
@@ -72,9 +58,7 @@ func Warn(v ...any) {
 
 // 打印Error级别日志
 func Error(v ...any) {
-	if glc != nil {
-		glc.Error(v...)
-	}
+	glc.Error(v...)
 	if logLevel <= 4 {
 		log.Println(append([]any{"ERROR"}, v...)...)
 	}
@@ -82,9 +66,7 @@ func Error(v ...any) {
 
 // 打印Fatal级别日志
 func Fatal(v ...any) {
-	if glc != nil {
-		glc.Fatal(v...)
-	}
+	glc.Fatal(v...)
 	if logLevel <= 5 {
 		log.Println(append([]any{"FATAL"}, v...)...)
 	}
@@ -92,17 +74,13 @@ func Fatal(v ...any) {
 
 // 打印Fatal级别日志，然后退出
 func Fatalln(v ...any) {
-	if glc != nil {
-		glc.Fatal(v...)
-	}
+	glc.Fatal(v...)
 	log.Fatalln(append([]any{"FATAL"}, v...)...)
 
 }
 
 // 打印日志
 func Println(v ...any) {
-	if glc != nil {
-		glc.SentLog(fmt.Sprint(v...))
-	}
+	glc.Println(fmt.Sprint(v...))
 	log.Println(v...)
 }
