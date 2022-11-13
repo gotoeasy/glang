@@ -9,7 +9,8 @@ import (
 
 // 按文字计算字符串长度
 func Len(str string) int {
-	return utf8.RuneCountInString(str)
+	// return utf8.RuneCountInString(str)
+	return len([]rune(str))
 }
 
 // 取左文字
