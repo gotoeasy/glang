@@ -139,3 +139,15 @@ func BoolToString(b bool) string {
 	}
 	return "false"
 }
+
+// int 转 Excel列字母 （如 1 -> A，2->B ）
+func IntToExcelColumn(iCol int) string {
+	if iCol <= 0 {
+		return ""
+	}
+	if iCol <= 26 {
+		return string(rune(iCol - 1 + 'A'))
+	}
+	iCol--
+	return string(rune(iCol/26%26-1+'A')) + string(rune(iCol%26+'A'))
+}
