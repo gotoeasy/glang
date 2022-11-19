@@ -3,6 +3,7 @@ module github.com/gotoeasy/glang
 go 1.19
 
 require (
+	github.com/anaskhan96/soup v1.2.5
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
@@ -10,6 +11,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/shopspring/decimal v1.3.1
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
+	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c
 )
 
 require (
@@ -36,7 +38,6 @@ require (
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c // indirect
 	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 )
