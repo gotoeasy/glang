@@ -22,7 +22,9 @@ func Test_jiebago(t *testing.T) {
 	Info(ws)
 
 	jieba.IngoreWords("的", "于")
-	ws = jieba.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的")
+	add := Split("我们,你们,他们", ",")
+	del := Split("都,和", ",")
+	ws = jieba.CutForSearchEx("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的", add, del)
 	Info(ws)
 
 }

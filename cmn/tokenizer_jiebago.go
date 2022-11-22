@@ -38,8 +38,8 @@ func NewTokenizerJiebago(dicFile string) *TokenizerJiebago {
 		mapIngoreWords: make(map[string]bool),
 	}
 
-	// 初始化默认忽略的字符
-	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n"
+	// 初始化默认忽略的字符单字
+	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n你我他它的是"
 	for _, s := range ingoreChars {
 		_segmenterJiebago.mapIngoreWords[string(s)] = true
 	}
@@ -55,18 +55,45 @@ func (t *TokenizerJiebago) IngoreWords(str ...string) {
 
 // 按搜索引擎模式进行分词（自动去重、去标点符号、忽略大小写）
 func (t *TokenizerJiebago) CutForSearch(str string) []string {
+	return t.CutForSearchEx(str, nil, nil)
+}
+
+// 按搜索引擎模式进行分词（自动去重、去标点符号、忽略大小写），可自定义添加或删除分词
+func (t *TokenizerJiebago) CutForSearchEx(str string, addWords []string, delWords []string) []string {
 	sch := t.segmenter.CutForSearch(ToLower(str), true)
 
 	var rs []string
 	var mapStr = make(map[string]string)
 	for w := range sch {
 		if _, has := t.mapIngoreWords[w]; has {
-			continue // 去忽略词
+			continue // 去默认忽略词
 		}
+
+		bDel := false
+		for _, word := range delWords {
+			if w == ToLower(word) {
+				bDel = true
+				break
+			}
+		}
+		if bDel {
+			continue // 去指定忽略词
+		}
+
 		if _, has := mapStr[w]; has {
 			continue // 去重
 		}
 		mapStr[w] = ""
+		rs = append(rs, w)
+	}
+
+	// 添加自定义的单词
+	for _, word := range addWords {
+		w := ToLower(word)
+		if _, has := mapStr[w]; has {
+			continue // 去重
+		}
+		mapStr[word] = ""
 		rs = append(rs, w)
 	}
 	return rs
