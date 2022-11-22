@@ -71,7 +71,7 @@ func Int64ToBytes(i int64) []byte {
 
 // uint32 转 string
 func Uint32ToString(num uint32) string {
-	return BytesToString(Uint32ToBytes(num))
+	return strconv.FormatUint(uint64(num), 10)
 }
 
 // uint32 转 []byte
