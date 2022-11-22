@@ -7,14 +7,12 @@ import (
 )
 
 type TokenizerJiebago struct {
-	segmenter jiebago.Segmenter
+	segmenter      jiebago.Segmenter
+	mapIngoreWords map[string]bool
 }
 
 var _segmenterJiebago *TokenizerJiebago
 var _segmenterJiebagoMu sync.Mutex
-
-// 分词结果忽略的单字
-var _ingoreCharsJiebago = "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n"
 
 // 创建中文分词器（jiebago）
 // 参数dicFile为字典文件，传入空时默认为"data/dictionary.txt"
@@ -36,9 +34,23 @@ func NewTokenizerJiebago(dicFile string) *TokenizerJiebago {
 	segmenter.LoadDictionary(dicFile)
 
 	_segmenterJiebago = &TokenizerJiebago{
-		segmenter: segmenter,
+		segmenter:      segmenter,
+		mapIngoreWords: make(map[string]bool),
+	}
+
+	// 初始化默认忽略的字符
+	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n"
+	for _, s := range ingoreChars {
+		_segmenterJiebago.mapIngoreWords[string(s)] = true
 	}
 	return _segmenterJiebago
+}
+
+// 设定忽略词（比如分词结果不想包含无效词“的”或一些敏感词时，可以这里设定）
+func (t *TokenizerJiebago) IngoreWords(str ...string) {
+	for _, s := range str {
+		t.mapIngoreWords[s] = true
+	}
 }
 
 // 按搜索引擎模式进行分词（自动去重、去标点符号、忽略大小写）
@@ -48,8 +60,8 @@ func (t *TokenizerJiebago) CutForSearch(str string) []string {
 	var rs []string
 	var mapStr = make(map[string]string)
 	for w := range sch {
-		if Contains(_ingoreCharsJiebago, w) {
-			continue // 忽略标点符号
+		if _, has := t.mapIngoreWords[w]; has {
+			continue // 去忽略词
 		}
 		if _, has := mapStr[w]; has {
 			continue // 去重
