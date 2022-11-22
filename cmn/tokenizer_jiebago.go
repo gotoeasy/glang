@@ -1,6 +1,8 @@
 package cmn
 
 import (
+	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/wangbin/jiebago"
@@ -28,7 +30,9 @@ func NewTokenizerJiebago(dicFile string) *TokenizerJiebago {
 
 	// 载入词典
 	if IsBlank(dicFile) {
-		dicFile = "data/dictionary.txt"
+		// dicFile = "data/dictionary.txt"
+		_, filename, _, _ := runtime.Caller(0) // 当前go文件所在路径
+		dicFile = filepath.Join(filepath.Dir(filename), "data/dictionary.txt")
 	}
 	var segmenter jiebago.Segmenter
 	segmenter.LoadDictionary(dicFile)
