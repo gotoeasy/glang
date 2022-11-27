@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+func Test_md5(t *testing.T) {
+	s := Md5File("d:\\7214354.bmp")
+	Info(s)
+}
+
 func Test_jwt(t *testing.T) {
 	j := NewJWT("kkkkkkkkkdsadsakkk")
 	kv := NewMapString().Put("user", "ssssssss").Put("group", "xxxxxxxxxx")

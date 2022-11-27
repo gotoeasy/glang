@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash/crc32"
+	"io"
+	"os"
 )
 
 // 哈希码
@@ -47,5 +49,20 @@ func Base64Decode(str string) ([]byte, error) {
 func Md5(bts []byte) string {
 	h := md5.New()
 	h.Write(bts)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// 文件MD5（文件读取失败时返回空串的MD5）
+func Md5File(pathfile string) string {
+	f, err := os.Open(pathfile)
+	if err != nil {
+		return Md5(StringToBytes(""))
+	}
+	defer f.Close()
+
+	h := md5.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return Md5(StringToBytes(""))
+	}
 	return hex.EncodeToString(h.Sum(nil))
 }
