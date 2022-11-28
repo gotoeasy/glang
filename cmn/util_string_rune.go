@@ -49,6 +49,11 @@ func Trim(str string) string {
 	return strings.TrimSpace(str)
 }
 
+// 去除左前缀
+func TrimPrefix(str string, prefix string) string {
+	return strings.TrimPrefix(str, prefix)
+}
+
 // 判断是否空白
 func IsBlank(str string) bool {
 	return strings.TrimSpace(str) == ""
