@@ -1,9 +1,7 @@
 package cmn
 
 import (
-	"math/rand"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
 
@@ -158,19 +156,6 @@ func Reverse(str string) string {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
-}
-
-// 随机半角英数字符串
-func RandomString(length int) string {
-	// str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
-	bytes := []byte(str)
-	var result []byte
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for i := 0; i < length; i++ {
-		result = append(result, bytes[r.Intn(len(bytes))])
-	}
-	return BytesToString(result)
 }
 
 // 字符串切割
