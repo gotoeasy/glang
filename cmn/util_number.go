@@ -22,6 +22,11 @@ func RandomUint32() uint32 {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Uint32()
 }
 
+// 随机数
+func RandomUint64() uint64 {
+	return rand.New(rand.NewSource(time.Now().UnixNano())).Uint64()
+}
+
 // 绝对值
 func AbsInt(a int) int {
 	if a < 0 {
