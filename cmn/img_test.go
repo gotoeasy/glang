@@ -6,6 +6,8 @@ import (
 
 func Test_img(t *testing.T) {
 
-	Info(ImgBlur("d:\\src.png", "d:\\xraxxxx.png", 10))
+	ImgResize("d:\\src.png", "d:\\dist1.png", 1024, 1024, nil)
+
+	Info(ImgBlur("d:\\src.png", "d:\\dist2.png", 10))
 
 }
