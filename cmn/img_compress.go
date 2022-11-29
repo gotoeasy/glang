@@ -14,7 +14,7 @@ import (
 // maxWidth：压缩后的最大宽度
 // maxHeight：压缩后的最大高度
 // o：压缩比例（nil时为默认80%）
-func ImageCompress(buf []byte, maxWidth uint, maxHeight uint, o *jpeg.Options) []byte {
+func ImgCompress(buf []byte, maxWidth uint, maxHeight uint, o *jpeg.Options) []byte {
 
 	// 文件压缩
 	img, layout, err := image.Decode(bytes.NewReader(buf))
