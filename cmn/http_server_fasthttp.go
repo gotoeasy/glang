@@ -31,21 +31,13 @@ func (f *FasthttpServer) BeforeRequestHandle(beforeHandle GlobalBeforeRequestHan
 
 // 注册POST方法的请求控制器
 func (f *FasthttpServer) HandlePost(path string, handle fasthttp.RequestHandler) *FasthttpServer {
-	f.router.POST(path, func(ctx *fasthttp.RequestCtx) {
-		if f.beforeHandle == nil || f.beforeHandle(ctx) {
-			handle(ctx)
-		}
-	})
+	f.Handle("POST", path, handle)
 	return f
 }
 
 // 注册GET方法的请求控制器
 func (f *FasthttpServer) HandleGet(path string, handle fasthttp.RequestHandler) *FasthttpServer {
-	f.router.GET(path, func(ctx *fasthttp.RequestCtx) {
-		if f.beforeHandle == nil || f.beforeHandle(ctx) {
-			handle(ctx)
-		}
-	})
+	f.Handle("GET", path, handle)
 	return f
 }
 
