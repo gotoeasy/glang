@@ -1,10 +1,13 @@
 package cmn
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/shopspring/decimal"
 )
 
-// float64 转 string
+// float64 转 string (注：万亿大数不绝对)
 func Float64ToString(num float64) string {
 	return decimal.NewFromFloat(num).String()
 }
@@ -60,5 +63,90 @@ func Round1(num float64) float64 {
 // 四舍五入保留2位小数
 func Round2(num float64) float64 {
 	rs, _ := decimal.NewFromFloat(num).Round(2).Float64()
+	return rs
+}
+
+// 保留指定位数(0-16)的小数（后面小数舍去）
+func RoundFloor(num float64, digit int32) float64 {
+	if digit < 0 {
+		digit = 0
+	}
+	if digit > 16 {
+		digit = 16
+	}
+	rs, _ := decimal.NewFromFloat(num).Round(digit).Float64()
+	return rs
+}
+
+// 金额数字转人民币大写（最大支持千万亿，小数只精确到分，分以下舍去。超过支持的最大值时原样返回不转换）
+//
+// 1234567890123456.789  -> 壹仟贰佰叁拾肆万伍仟陆佰柒拾捌亿玖仟零壹拾贰万叁仟肆佰伍拾陆元柒角捌分
+// -1234567890123456.78  -> 负壹仟贰佰叁拾肆万伍仟陆佰柒拾捌亿玖仟零壹拾贰万叁仟肆佰伍拾陆元柒角捌分
+// 12345.7               -> 壹万贰仟叁佰肆拾伍元柒角整
+// 12345.0               -> 壹万贰仟叁佰肆拾伍元整
+// 12345                 -> 壹万贰仟叁佰肆拾伍元整
+// 9002300040            -> 玖拾亿零贰佰叁拾万零肆拾元整
+// 9002300043.0          -> 玖拾亿零贰佰叁拾万零肆拾叁元整
+// 12345678901234567.781 -> 12345678901234567.781
+func AmountToCny(val string) string {
+
+	ary := Split(val, ".")
+	num := ary[0]
+	if len(ary) == 1 {
+		num += "00"
+	} else if len(ary) == 2 {
+		if len(ary[1]) > 2 {
+			num += Left(ary[1], 2)
+		} else {
+			num += PadRight(ary[1], "0", 2)
+		}
+	}
+
+	pre := ""
+	if Startwiths(num, "-") {
+		pre = "负"
+		num = ReplaceAll(num, "-", "")
+	}
+
+	if len(num) > 18 {
+		return val
+	}
+
+	chineseMap := []string{"分", "角", "元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟"}
+	chineseNum := []string{"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"}
+	listNum := []int{}
+
+	for _, s := range strings.Split(Reverse(num), "") {
+		listNum = append(listNum, StringToInt(s, 0))
+	}
+	n := len(listNum)
+	chinese := ""
+	for i := n - 1; i >= 0; i-- {
+		chinese = fmt.Sprintf("%s%s%s", chinese, chineseNum[listNum[i]], chineseMap[i])
+	}
+
+	for {
+		copychinese := chinese
+		copychinese = strings.Replace(copychinese, "零万", "万", 1)
+		copychinese = strings.Replace(copychinese, "零亿", "亿", 1)
+		copychinese = strings.Replace(copychinese, "零拾", "零", 1)
+		copychinese = strings.Replace(copychinese, "零佰", "零", 1)
+		copychinese = strings.Replace(copychinese, "零仟", "零", 1)
+		copychinese = strings.Replace(copychinese, "零角", "零", 1)
+		copychinese = strings.Replace(copychinese, "零零", "零", 1)
+		copychinese = strings.Replace(copychinese, "零元", "元", 1)
+		copychinese = strings.Replace(copychinese, "零分", "", 1)
+
+		if copychinese == chinese {
+			break
+		} else {
+			chinese = copychinese
+		}
+	}
+
+	rs := pre + chinese
+	if !Endwiths(rs, "分") {
+		rs += "整"
+	}
 	return rs
 }
