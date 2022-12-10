@@ -7,7 +7,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// float64 转 string (注：万亿大数不绝对)
+// float64 转 string，保留指定位数小数，后续小数位舍去
+//
+// Float64ToStringRoundDown(1234567890123456,2) -> 1234567890123456.00
+// Float64ToStringRoundDown(999999999999.999,2) -> 999999999999.99
+func Float64ToStringRoundDown(num float64, digit int32) string {
+	return decimal.NewFromFloat(num).RoundDown(digit).StringFixedBank(digit)
+}
+
+// float64 转 string (注：千万亿大数时可能进位，不绝对)
 func Float64ToString(num float64) string {
 	return decimal.NewFromFloat(num).String()
 }
@@ -67,15 +75,20 @@ func Round2(num float64) float64 {
 }
 
 // 保留指定位数(0-16)的小数（后面小数舍去）
-func RoundFloor(num float64, digit int32) float64 {
+func RoundDown(num float64, digit int32) float64 {
 	if digit < 0 {
 		digit = 0
 	}
 	if digit > 16 {
 		digit = 16
 	}
-	rs, _ := decimal.NewFromFloat(num).Round(digit).Float64()
+	rs, _ := decimal.NewFromFloat(num).RoundDown(digit).Float64()
 	return rs
+}
+
+// 金额数字转人民币大写（百万亿级别正常，超过范围可能转数字字符串出现进位）
+func Float64ToCny(val float64) string {
+	return AmountToCny(Float64ToStringRoundDown(val, 2))
 }
 
 // 金额数字转人民币大写（最大支持千万亿，小数只精确到分，分以下舍去。超过支持的最大值时原样返回不转换）

@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"math"
 	"testing"
 )
 
@@ -11,8 +12,14 @@ func Test_uid(t *testing.T) {
 }
 
 func Test_str(t *testing.T) {
-	Info(Left("啊啊啊哦哦哦呃呃呃", 3))
-	Info(Right("啊啊啊哦哦哦呃呃呃", 3))
+	Info(Float64ToStringRoundDown(1234567890123456, 2))
+	Info(Float64ToStringRoundDown(999999999999.999, 2))
+	Info(Float64ToCny(1234567890123456.789))
+	Info(Float64ToCny(-1234567890123456.789))
+	Info(Float64ToCny(-9234567890123456.789))
+	Info(Float64ToCny(math.MaxInt32 + 0.789))
+	Info(Float64ToCny(math.MaxUint32 + 0.789))
+	Info(Float64ToCny(999999999999.999))
 }
 
 func Test_decimal(t *testing.T) {
