@@ -7,39 +7,35 @@ import (
 
 // 按文字计算字符串长度
 func Len(str string) int {
-	// return utf8.RuneCountInString(str)
 	return len([]rune(str))
 }
 
 // 取左文字
 func Left(str string, length int) string {
-	if Len(str) <= length {
+	srune := []rune(str)
+	lenr := len(srune)
+	if lenr <= length {
 		return str
 	}
 
 	var rs string
-	for i, s := range str {
-		if i == length {
-			break
-		}
-		rs = rs + string(s)
+	for i := 0; i < length; i++ {
+		rs += string(srune[i])
 	}
 	return rs
 }
 
 // 取右文字
 func Right(str string, length int) string {
-	lenr := Len(str)
+	srune := []rune(str)
+	lenr := len(srune)
 	if lenr <= length {
 		return str
 	}
 
 	var rs string
-	start := lenr - length
-	for i, s := range str {
-		if i >= start {
-			rs = rs + string(s)
-		}
+	for i := lenr - length; i < lenr; i++ {
+		rs += string(srune[i])
 	}
 	return rs
 }
