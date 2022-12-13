@@ -39,5 +39,9 @@ func GetCityByIp(ip string) string {
 		return ""
 	}
 
+	if d.Pro != "" && d.Pro == d.City {
+		return d.Pro
+	}
+
 	return Trim(d.Pro + d.City)
 }
