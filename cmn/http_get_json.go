@@ -26,8 +26,6 @@ func HttpGetJson(url string, headers ...string) ([]byte, error) {
 	// 读取响应内容
 	client := http.Client{}
 	res, err := client.Do(req)
-	defer req.Body.Close()
-
 	if err != nil {
 		return nil, err
 	}
