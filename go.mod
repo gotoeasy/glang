@@ -13,6 +13,7 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c
+	golang.org/x/text v0.4.0
 )
 
 require (
@@ -39,7 +40,6 @@ require (
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 )
 
