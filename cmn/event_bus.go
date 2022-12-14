@@ -34,6 +34,7 @@ func (e *EventBus) On(event string, handle EventHandler) *EventBus {
 
 // 触发事件
 func (e *EventBus) At(event string, params ...any) *EventBus {
+
 	name := ToLower(Trim(event))
 	handles := e.mapHandle[name]
 	if handles == nil || len(handles) < 1 {
@@ -41,12 +42,17 @@ func (e *EventBus) At(event string, params ...any) *EventBus {
 	}
 
 	for i := 0; i < len(handles); i++ {
-		defer func() {
-			if err := recover(); err != nil {
-				Error("事件执行发生异常，事件名：", name, "，参数：", params, "，异常：", err)
-			}
-		}()
-		handles[i](params...)
+		go execEvent(name, handles[i], params...) // 异步执行，出错时打印错误，不中断循环
 	}
+
 	return e
+}
+
+func execEvent(name string, handle EventHandler, params ...any) {
+	defer func() {
+		if err := recover(); err != nil {
+			Error("事件执行发生异常，事件名：", name, "，参数：", params, "，异常：", err)
+		}
+	}()
+	handle(params...)
 }
