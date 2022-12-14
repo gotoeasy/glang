@@ -5,6 +5,9 @@ import (
 	"testing"
 )
 
+func Test_chk(t *testing.T) {
+	Info(IsEmail("1@1.1"))
+}
 func Test_uid(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		Info(ULID())

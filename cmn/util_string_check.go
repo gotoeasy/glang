@@ -3,9 +3,9 @@ package cmn
 import (
 	"fmt"
 	"math"
+	"net"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 // 判断是否数值（123、123.456、-123.456都认为是数值）
@@ -113,7 +113,7 @@ func IsIdCard(idCard string) bool {
 		10: 2,
 	}
 
-	var idStr = strings.ToUpper(idCard)
+	var idStr = ToUpper(idCard)
 	var reg, err = regexp.Compile(`^[0-9]{17}[0-9X]$`)
 	if err != nil {
 		return false
@@ -143,4 +143,32 @@ func IsIdCard(idCard string) bool {
 		a1Str = "X"
 	}
 	return a1Str == signChar
+}
+
+// 判断是否IP地址
+func IsIp(str string) bool {
+	return net.ParseIP(str) != nil
+}
+
+// 判断是否IPv4地址
+func IsIPv4(str string) bool {
+	ip := net.ParseIP(str)
+	if ip == nil {
+		return false
+	}
+	return Contains(str, ".")
+}
+
+// 判断是否IPv6地址
+func IsIPv6(str string) bool {
+	ip := net.ParseIP(str)
+	if ip == nil {
+		return false
+	}
+	return Contains(str, ":")
+}
+
+func IsEmail(str string) bool {
+	pat := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+	return regexp.MustCompile(pat).MatchString(str)
 }
