@@ -168,6 +168,7 @@ func IsIPv6(str string) bool {
 	return Contains(str, ":")
 }
 
+// 判断是否Email地址
 func IsEmail(str string) bool {
 	pat := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 	return regexp.MustCompile(pat).MatchString(str)
