@@ -6,6 +6,7 @@ import (
 	"net"
 	"regexp"
 	"strconv"
+	"unicode/utf8"
 )
 
 // 判断是否数值（123、123.456、-123.456都认为是数值）
@@ -78,6 +79,16 @@ func IsAlphaDigit(s string) bool {
 		}
 	}
 	return true
+}
+
+// 判断是否全部都是半角字符
+func IsHalfWidth(s string) bool {
+	return utf8.RuneCountInString(s) == len(s)
+}
+
+// 判断是否全部都是全角字符
+func IsFullWidth(s string) bool {
+	return utf8.RuneCountInString(s)*3 == len(s)
 }
 
 // 判断是否手机号
