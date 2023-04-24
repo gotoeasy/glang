@@ -93,11 +93,11 @@ func (t *TokenizerJiebago) CutForSearchEx(str string, addWords []string, delWord
 
 	// 添加自定义的单词
 	for _, word := range addWords {
-		w := ToLower(word)
+		w := Trim(ToLower(word))
 		if _, has := mapStr[w]; has {
 			continue // 去重
 		}
-		mapStr[word] = ""
+		mapStr[w] = ""
 		rs = append(rs, w)
 	}
 	return rs
