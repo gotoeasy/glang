@@ -3,6 +3,7 @@ package cmn
 import "net"
 
 var localIpAddres string
+var localHostName string
 
 // 取本机IP地址（IPv4）
 func GetLocalIp() string {
@@ -19,4 +20,17 @@ func GetLocalIp() string {
 		}
 	}
 	return localIpAddres
+}
+
+// 取本机名
+func GetLocalHostName() string {
+	if localHostName != "" {
+		return localHostName
+	}
+
+	info, err := MeasureHost()
+	if err != nil {
+		localHostName = info.Hostname
+	}
+	return localHostName
 }

@@ -1,9 +1,29 @@
 package cmn
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 )
+
+// 日志接口数据结构体
+type LogDataModel struct {
+	Text       string `json:"text,omitempty"`       // 【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象
+	Date       string `json:"date,omitempty"`       // 日期（格式YYYY-MM-DD HH:MM:SS.SSS）
+	System     string `json:"system,omitempty"`     // 系统名
+	ServerName string `json:"servername,omitempty"` // 服务器名
+	ServerIp   string `json:"serverip,omitempty"`   // 服务器IP
+	ClientIp   string `json:"client,omitempty"`     // 客户端IP
+	TraceId    string `json:"traceid,omitempty"`    // 跟踪ID
+	LogType    string `json:"logtype,omitempty"`    // 日志类型（1:登录日志、2:操作日志）
+	User       string `json:"user,omitempty"`       // 用户
+	Module     string `json:"module,omitempty"`     // 模块
+	Operation  string `json:"action,omitempty"`     // 操作
+}
+
+func (d *LogDataModel) ToJson() string {
+	bt, _ := json.Marshal(d)
+	return BytesToString(bt)
+}
 
 // 日志中心客户端结构体
 //
@@ -173,20 +193,13 @@ func (g *GLogCenterClient) print(system string, text string) {
 	if IsBlank(text) {
 		return
 	}
-	var data strings.Builder
-	data.WriteString("{")
-	data.WriteString(`"system":"` + g.encodeGlcJsonValue(system) + `"`)
-	data.WriteString(`,"date":"` + FormatSystemDate(FMT_YYYY_MM_DD_HH_MM_SS_SSS) + `"`)
-	data.WriteString(`,"text":"` + g.encodeGlcJsonValue(text) + `"`)
-	data.WriteString("}")
 
-	g.logChan <- data.String()
-}
+	data := new(LogDataModel)
+	data.System = system
+	data.Date = FormatSystemDate(FMT_YYYY_MM_DD_HH_MM_SS_SSS)
+	data.Text = text
+	data.ServerIp = GetLocalIp()
+	data.ServerName = GetLocalHostName()
 
-func (g *GLogCenterClient) encodeGlcJsonValue(v string) string {
-	v = ReplaceAll(v, `"`, `\"`)
-	v = ReplaceAll(v, "\t", "\\\\t")
-	v = ReplaceAll(v, "\r", "\\\\r")
-	v = ReplaceAll(v, "\n", "\\\\n")
-	return v
+	g.logChan <- data.ToJson()
 }
