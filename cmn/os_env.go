@@ -21,6 +21,15 @@ func IsLinux() bool {
 	return runtime.GOOS == "linux"
 }
 
+// 是否alpine系统
+func IsAlpine() bool {
+	info, err := MeasureHost()
+	if err != nil {
+		return false
+	}
+	return ContainsIngoreCase(info.Platform, "alpine")
+}
+
 // 取环境变量
 func GetEnvStr(name string, defaultValue string) string {
 	s := os.Getenv(name)
