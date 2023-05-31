@@ -5,6 +5,8 @@ import (
 	"errors"
 	"reflect"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var _sqlDb *sql.DB
@@ -22,8 +24,7 @@ func init() {
 	dataSource := GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		Error(err)
-		return
+		panic(err) // 特意触发装载驱动
 	}
 
 	db.SetMaxIdleConns(5)                // 最大空闲连接数

@@ -3,8 +3,6 @@ package cmn
 import (
 	"testing"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type xx_test struct {
