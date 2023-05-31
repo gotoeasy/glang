@@ -31,33 +31,45 @@ func IsAlpine() bool {
 }
 
 // 取环境变量
-func GetEnvStr(name string, defaultValue string) string {
+func GetEnvStr(name string, defaultValue ...string) string {
 	s := os.Getenv(name)
 	if s == "" {
-		return defaultValue
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return ""
 	}
 	return s
 }
 
 // 取环境变量
-func GetEnvInt(name string, defaultValue int) int {
+func GetEnvInt(name string, defaultValue ...int) int {
 	s := os.Getenv(name)
 	if s == "" {
-		return defaultValue
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return 0
 	}
 
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		return defaultValue
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return 0
 	}
 	return v
 }
 
 // 取环境变量
-func GetEnvBool(name string, defaultValue bool) bool {
+func GetEnvBool(name string, defaultValue ...bool) bool {
 	s := os.Getenv(name)
 	if s == "" {
-		return defaultValue
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return false
 	}
 
 	if ToLower(s) == "true" {
@@ -66,5 +78,9 @@ func GetEnvBool(name string, defaultValue bool) bool {
 	if ToLower(s) == "false" {
 		return false
 	}
-	return defaultValue
+
+	if len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	return false
 }
