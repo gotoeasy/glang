@@ -1,6 +1,8 @@
 package cmn
 
-import "time"
+import (
+	"time"
+)
 
 // 计算函数执行时间（毫秒）
 func ExecTime(fn func()) int64 {

@@ -2,6 +2,7 @@ package cmn
 
 import (
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -180,4 +181,43 @@ func Unique(strs []string) []string {
 		}
 	}
 	return newS
+}
+
+// 首字母转大写
+func Titlelize(str string) string {
+	return ToUpper(Left(str, 1)) + Right(str, Len(str)-1)
+}
+
+// 驼峰转全小写下划线(已含下划线时直接转小写)
+func CamelToUnderline(str string) string {
+	if Contains(str, "_") {
+		return ToLower(str)
+	}
+
+	var rs []rune
+	for i, r := range str {
+		if i == 0 {
+			rs = append(rs, r)
+		} else {
+			if unicode.IsUpper(r) {
+				rs = append(rs, '_')
+			}
+			rs = append(rs, r)
+		}
+	}
+	return ToLower(string(rs))
+}
+
+// 下划线转驼峰(无下划线时不转换)
+func UnderlineToCamel(str string) string {
+	if !Contains(str, "_") {
+		return str
+	}
+
+	ary := Split(ToLower(str), "_")
+	var rs string
+	for i := 0; i < len(ary); i++ {
+		rs += Titlelize(ary[i])
+	}
+	return rs
 }
