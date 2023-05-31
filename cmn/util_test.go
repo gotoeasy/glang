@@ -41,3 +41,10 @@ func Test_decimal(t *testing.T) {
 	Info(AmountToCny("12345678901234567.781"))
 
 }
+
+func Test_CamelToUnderline(t *testing.T) {
+
+	Info(CamelToUnderline("dsAdddSSdsdsAA"))
+	Info(UnderlineToCamel("ds_Addd_SSdsds_AA"))
+
+}

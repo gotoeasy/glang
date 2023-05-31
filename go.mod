@@ -1,10 +1,11 @@
 module github.com/gotoeasy/glang
 
-go 1.19
+go 1.20
 
 require (
 	github.com/anaskhan96/soup v1.2.5
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
@@ -47,6 +48,7 @@ require (
 	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/minio/minio-go/v7 v7.0.43
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/valyala/fasthttp v1.41.0
