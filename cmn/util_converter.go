@@ -16,6 +16,15 @@ func StringToInt(s string, defaultVal int) int {
 	return v
 }
 
+// string 转 int64
+func StringToInt64(s string, defaultVal int64) int64 {
+	v, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
 // string 转 float64
 func String2Float64(s string, defaultVal float64) float64 {
 	v, err := strconv.ParseFloat(s, 64)
