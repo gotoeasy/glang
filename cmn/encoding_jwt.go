@@ -23,7 +23,15 @@ func (j *JWT) CreateToken(mapKv MapString, exp time.Duration) (string, error) {
 	for k, v := range mapKv {
 		claims[k] = v
 	}
-	claims["exp"] = time.Now().Add(exp).Unix() // 设定超时时间
+	claims["expire"] = time.Now().Add(exp).Unix() // 设定超时时间
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(j.secret)
+}
+
+// 创建令牌（默认HS256算法）
+func (j *JWT) NewToken(username string) (string, error) {
+	claims := make(jwt.MapClaims)
+	claims["username"] = username
+	claims["expire"] = time.Now().Add(time.Minute * 15).Unix() // TODO 配置超时时间
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(j.secret)
 }
 
