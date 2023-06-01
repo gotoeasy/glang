@@ -16,6 +16,12 @@ type DbHandle struct {
 	db  *sql.DB
 	tx  *sql.Tx
 	err error
+	opt *DbOption
+}
+
+// 配置项
+type DbOption struct {
+	AutoCommit bool // 是否自动提交
 }
 
 // 初始化数据库配置
@@ -35,32 +41,45 @@ func init() {
 }
 
 // 新建数据库控制器
-func NewDbHandle() *DbHandle {
-	return &DbHandle{
-		db: _sqlDb,
+func NewDbHandle(opt ...*DbOption) *DbHandle {
+	db := &DbHandle{
+		db:  _sqlDb,
+		opt: &DbOption{},
 	}
+
+	if len(opt) > 0 {
+		db.opt = opt[0]
+	}
+
+	return db
 }
 
-// 开启事务，失败时返回错误
-func (d *DbHandle) BeginTransaction() error {
+// 开启事务，出错时panic
+func (d *DbHandle) BeginTransaction() {
+	if d == nil {
+		return // 忽视
+	}
+
 	if d.tx != nil {
 		Warn("重复开启事务（忽略操作）")
-		return nil // 重复Begin不出错，简单忽视
+		return // 重复Begin不出错，简单忽视
 	}
 
 	tx, err := d.db.Begin()
 	if err != nil {
-		Error("开启事务失败", err)
-		return err
+		panic(errors.Join(errors.New("开启事务失败"), err))
 	} else {
 		Debug("开启事务")
 		d.tx = tx
 	}
-	return nil
 }
 
 // 提交事务，失败时返回错误
 func (d *DbHandle) Commit() error {
+	if d == nil {
+		return nil // 忽视
+	}
+
 	if d.tx == nil {
 		Error("无效的提交（事务还没有开始，忽略操作）")
 		return nil
@@ -78,6 +97,10 @@ func (d *DbHandle) Commit() error {
 
 // 提交事务，失败时返回错误
 func (d *DbHandle) Rollback() error {
+	if d == nil {
+		return nil // 忽视
+	}
+
 	if d.tx == nil {
 		Error("无效的回滚（事务还没有开始，忽略操作）")
 		return nil
@@ -95,6 +118,10 @@ func (d *DbHandle) Rollback() error {
 
 // 结束事务（未曾出错时提交，否则回滚），失败时返回错误
 func (d *DbHandle) EndTransaction() error {
+	if d == nil {
+		return nil // 忽视
+	}
+
 	if d.err == nil {
 		return d.Commit()
 	} else {
@@ -104,6 +131,10 @@ func (d *DbHandle) EndTransaction() error {
 
 // 执行SQL（开启事务时自动在事务内执行），出错时panic
 func (d *DbHandle) Execute(sql string, params ...any) int64 {
+	if !d.opt.AutoCommit && d.tx == nil {
+		d.BeginTransaction()
+	}
+
 	var cnt int64
 	var err error
 	if d.tx != nil {
