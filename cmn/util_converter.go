@@ -3,6 +3,7 @@ package cmn
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 	"strconv"
 	"unsafe"
 )
@@ -159,4 +160,16 @@ func IntToExcelColumn(iCol int) string {
 	}
 	iCol--
 	return string(rune(iCol/26%26-1+'A')) + string(rune(iCol%26+'A'))
+}
+
+// io.Reader 转 []byte
+func ReaderToBytes(ioReader io.Reader) []byte {
+	buf := &bytes.Buffer{}
+	buf.ReadFrom(ioReader)
+	return buf.Bytes()
+}
+
+// []byte 转 io.Reader
+func BytesToReader(bts []byte) io.Reader {
+	return bytes.NewReader(bts)
 }

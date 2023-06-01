@@ -86,7 +86,7 @@ func (d *DbHandle) Commit() error {
 	}
 
 	if d.tx == nil {
-		Error("无效的提交（事务还没有开始，忽略操作）")
+		Warn("无效的提交（事务还没有开始，忽略操作）")
 		return nil
 	}
 	err := d.tx.Commit()
@@ -107,7 +107,7 @@ func (d *DbHandle) Rollback() error {
 	}
 
 	if d.tx == nil {
-		Error("无效的回滚（事务还没有开始，忽略操作）")
+		Warn("无效的回滚（事务还没有开始，忽略操作）")
 		return nil
 	}
 	err := d.tx.Rollback()
