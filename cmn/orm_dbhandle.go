@@ -54,6 +54,11 @@ func NewDbHandle(opt ...*DbOption) *DbHandle {
 	return db
 }
 
+// 是否自动提交
+func (d *DbHandle) IsAutoCommit() bool {
+	return d.opt.AutoCommit
+}
+
 // 开启事务，出错时panic
 func (d *DbHandle) BeginTransaction() {
 	if d == nil {
