@@ -12,9 +12,10 @@ type LogDataModel struct {
 	System     string `json:"system,omitempty"`     // 系统名
 	ServerName string `json:"servername,omitempty"` // 服务器名
 	ServerIp   string `json:"serverip,omitempty"`   // 服务器IP
-	ClientIp   string `json:"client,omitempty"`     // 客户端IP
+	ClientIp   string `json:"clientip,omitempty"`   // 客户端IP
 	TraceId    string `json:"traceid,omitempty"`    // 跟踪ID
 	LogType    string `json:"logtype,omitempty"`    // 日志类型（1:登录日志、2:操作日志）
+	LogLevel   string `json:"loglevel,omitempty"`   // 日志级别
 	User       string `json:"user,omitempty"`       // 用户
 	Module     string `json:"module,omitempty"`     // 模块
 	Operation  string `json:"action,omitempty"`     // 操作
@@ -103,93 +104,93 @@ func SetLogCenterClient(glcClient *GLogCenterClient) {
 // 发送Trace级别日志到日志中心
 func (g *GLogCenterClient) Trace(v ...any) {
 	if glc.enable && glc.logLevel <= 0 {
-		g.Println("TRACE " + fmt.Sprint(v...))
+		g.print(g.system, "TRACE", "TRACE "+fmt.Sprint(v...))
 	}
 }
 
 // 发送指定系统名的Trace级别日志到日志中心
 func (g *GLogCenterClient) TraceSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 0 {
-		g.print(system, "TRACE "+fmt.Sprint(v...))
+		g.print(g.system, "TRACE", "TRACE "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Debug级别日志到日志中心
 func (g *GLogCenterClient) Debug(v ...any) {
 	if glc.enable && glc.logLevel <= 1 {
-		g.Println("DEBUG " + fmt.Sprint(v...))
+		g.print(g.system, "DEBUG", "DEBUG "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Debug级别日志到日志中心
 func (g *GLogCenterClient) DebugSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 1 {
-		g.Println("DEBUG " + fmt.Sprint(v...))
+		g.print(g.system, "DEBUG", "DEBUG "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Info级别日志到日志中心
 func (g *GLogCenterClient) Info(v ...any) {
 	if glc.enable && glc.logLevel <= 2 {
-		g.Println("INFO " + fmt.Sprint(v...))
+		g.print(g.system, "INFO", "INFO "+fmt.Sprint(v...))
 	}
 }
 
 // 发送指定系统名的Info级别日志到日志中心
 func (g *GLogCenterClient) InfoSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 2 {
-		g.print(system, "INFO "+fmt.Sprint(v...))
+		g.print(system, "INFO", "INFO "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Warn级别日志到日志中心
 func (g *GLogCenterClient) Warn(v ...any) {
 	if glc.enable && glc.logLevel <= 3 {
-		g.Println("WARN " + fmt.Sprint(v...))
+		g.print(g.system, "WARN", "WARN "+fmt.Sprint(v...))
 	}
 }
 
 // 发送指定系统名的Warn级别日志到日志中心
 func (g *GLogCenterClient) WarnSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 3 {
-		g.print(system, "WARN "+fmt.Sprint(v...))
+		g.print(system, "WARN", "WARN "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Error级别日志到日志中心
 func (g *GLogCenterClient) Error(v ...any) {
 	if glc.enable && glc.logLevel <= 4 {
-		g.Println("ERROR " + fmt.Sprint(v...))
+		g.print(g.system, "ERROR", "ERROR "+fmt.Sprint(v...))
 	}
 }
 
 // 发送指定系统名的Error级别日志到日志中心
 func (g *GLogCenterClient) ErrorSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 4 {
-		g.print(system, "ERROR "+fmt.Sprint(v...))
+		g.print(system, "ERROR", "ERROR "+fmt.Sprint(v...))
 	}
 }
 
 // 发送Fatal级别日志到日志中心
 func (g *GLogCenterClient) Fatal(v ...any) {
 	if glc.enable && glc.logLevel <= 5 {
-		g.Println("FATAL " + fmt.Sprint(v...))
+		g.print(g.system, "FATAL", "FATAL "+fmt.Sprint(v...))
 	}
 }
 
 // 发送指定系统名的Fatal级别日志到日志中心
 func (g *GLogCenterClient) FatalSys(system string, v ...any) {
 	if glc.enable && glc.logLevel <= 5 {
-		g.print(system, "FATAL "+fmt.Sprint(v...))
+		g.print(system, "FATAL", "FATAL "+fmt.Sprint(v...))
 	}
 }
 
 // 发送日志到日志中心
 func (g *GLogCenterClient) Println(text string) {
-	g.print(g.system, text)
+	g.print(g.system, "INFO", text)
 }
 
-func (g *GLogCenterClient) print(system string, text string) {
+func (g *GLogCenterClient) print(system string, logLevel string, text string) {
 	if IsBlank(text) {
 		return
 	}
@@ -200,6 +201,7 @@ func (g *GLogCenterClient) print(system string, text string) {
 	data.Text = text
 	data.ServerIp = GetLocalIp()
 	data.ServerName = GetLocalHostName()
+	data.LogLevel = logLevel
 
 	g.logChan <- data.ToJson()
 }
