@@ -54,5 +54,5 @@ require (
 	github.com/valyala/fasthttp v1.41.0
 	github.com/wangbin/jiebago v0.3.2
 	golang.org/x/image v0.1.0
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10
 )
