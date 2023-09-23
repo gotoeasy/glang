@@ -1,6 +1,8 @@
 package cmn
 
 import (
+	"errors"
+	"net/http"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -39,5 +41,8 @@ func FasthttpPostJson(url string, jsondata string, headers ...string) ([]byte, e
 		return nil, err
 	}
 
+	if res.StatusCode() != http.StatusOK {
+		return nil, errors.New(IntToString(res.StatusCode()))
+	}
 	return res.Body(), nil
 }

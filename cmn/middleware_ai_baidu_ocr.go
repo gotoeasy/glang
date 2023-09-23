@@ -68,7 +68,8 @@ func (b *BaiduOcr) QuotaInvoice(filebytes []byte, isPdf bool) (string, error) {
 	} else {
 		formMap["image"] = b64str
 	}
-	return HttpPostForm(uri.String(), formMap)
+	bts, err := HttpPostForm(uri.String(), formMap)
+	return BytesToString(bts), err
 }
 
 // 增值税发票识别，支持png/jpeg/jpg/bpm/pdf类型（返回JSON识别结果）
@@ -108,7 +109,8 @@ func (b *BaiduOcr) VatInvoice(filebytes []byte, isPdf bool) (string, error) {
 	} else {
 		formMap["image"] = b64str
 	}
-	return HttpPostForm(uri.String(), formMap)
+	bts, err := HttpPostForm(uri.String(), formMap)
+	return BytesToString(bts), err
 }
 
 // 取令牌

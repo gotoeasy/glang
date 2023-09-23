@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -31,6 +32,10 @@ func HttpPostJson(url string, jsondata string, headers ...string) ([]byte, error
 		return nil, err
 	}
 	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New(IntToString(res.StatusCode))
+	}
 
 	return io.ReadAll(res.Body)
 }

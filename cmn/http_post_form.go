@@ -1,13 +1,14 @@
 package cmn
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strings"
 )
 
 // 使用标准包进行Post请求，固定Content-Type:application/x-www-form-urlencoded，其他自定义headers格式为 K:V
-func HttpPostForm(url string, formMap map[string]string, headers ...string) (string, error) {
+func HttpPostForm(url string, formMap map[string]string, headers ...string) ([]byte, error) {
 
 	sendBody := http.Request{}
 	sendBody.ParseForm()
@@ -20,7 +21,7 @@ func HttpPostForm(url string, formMap map[string]string, headers ...string) (str
 	client := &http.Client{}
 	request, err := http.NewRequest("POST", url, strings.NewReader(sendData))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	for i, max := 0, len(headers); i < max; i++ {
@@ -28,18 +29,16 @@ func HttpPostForm(url string, formMap map[string]string, headers ...string) (str
 		if len(strs) > 1 {
 			request.Header.Set(Trim(strs[0]), Trim(strs[1]))
 		}
-
 	}
 
-	response, err := client.Do(request)
+	res, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	defer response.Body.Close()
-	result, err := io.ReadAll(response.Body)
-	if err != nil {
-		return "", err
-	}
+	defer res.Body.Close()
 
-	return BytesToString(result), nil
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New(IntToString(res.StatusCode))
+	}
+	return io.ReadAll(res.Body)
 }
