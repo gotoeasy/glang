@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -149,6 +150,12 @@ func Replace(str string, old string, new string, n int) string {
 // 全部替换
 func ReplaceAll(str string, old string, new string) string {
 	return strings.ReplaceAll(str, old, new)
+}
+
+// 全部替换连续的空白
+func ReplaceAllSpace(str string, new string) string {
+	re := regexp.MustCompile(`\s+`)
+	return re.ReplaceAllString(str, new)
 }
 
 // 反转
