@@ -58,6 +58,31 @@ func RegistrySetUrlProtocol(appname string, appNote string, exePath string) erro
 	return nil
 }
 
+// 在指定ROOT下的指定子项中，设定字符串键值对
+func RegistrySetStringValue(root registry.Key, path string, key string, value string) error {
+	pathKey, err := registryOpenOrCreateKey(root, path)
+	if err != nil {
+		return err
+	}
+	defer pathKey.Close()
+	return pathKey.SetStringValue(key, value)
+}
+
+// 在指定ROOT下的指定子项中，读取指定键的字符串值，读取失败时返回默认值
+func RegistryGetStringValue(root registry.Key, path string, key string, defaultValue string) string {
+	pathKey, err := registry.OpenKey(root, path, registry.ALL_ACCESS)
+	if err != nil {
+		return defaultValue
+	}
+	defer pathKey.Close()
+	val, _, err := pathKey.GetStringValue(key)
+	if err != nil {
+		return defaultValue
+	}
+	return val
+}
+
+// 在指定ROOT下打开指定项（如 SOFTWARE/myapp/Settings ），不存在时自动创建
 func registryOpenOrCreateKey(k registry.Key, path string) (registry.Key, error) {
 	key, err := registry.OpenKey(k, path, registry.ALL_ACCESS)
 	if err == nil {

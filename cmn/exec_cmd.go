@@ -10,9 +10,11 @@ func ExecCmd(command string) (stdout, stderr string, err error) {
 	var out bytes.Buffer
 	var errout bytes.Buffer
 
-	cmd := exec.Command("/bin/bash", "-c", command)
+	var cmd *exec.Cmd
 	if IsWin() {
 		cmd = exec.Command("cmd")
+	} else {
+		cmd = exec.Command("/bin/bash", "-c", command)
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &errout
