@@ -10,6 +10,9 @@ type FasthttpServer struct {
 	router       *fasthttprouter.Router
 	server       *fasthttp.Server
 	port         string
+	tsl          bool
+	certData     []byte
+	keyData      []byte
 	beforeHandle GlobalBeforeRequestHandler
 }
 
@@ -57,6 +60,14 @@ func (f *FasthttpServer) SetPort(port string) *FasthttpServer {
 	return f
 }
 
+// 开启TSL
+func (f *FasthttpServer) EnableTsl(certData []byte, keyData []byte) *FasthttpServer {
+	f.tsl = true
+	f.certData = certData
+	f.keyData = keyData
+	return f
+}
+
 // 设定服务配置项（参数中的Handler配置项将被忽略）
 func (f *FasthttpServer) SetServer(server *fasthttp.Server) *FasthttpServer {
 	f.server = server
@@ -83,5 +94,8 @@ func (f *FasthttpServer) Start() error {
 	f.server.Handler = f.router.Handler
 
 	// 启动服务
+	if f.tsl {
+		return f.server.ListenAndServeTLSEmbed(addr, f.certData, f.keyData) // ssl
+	}
 	return f.server.ListenAndServe(addr)
 }
