@@ -5,6 +5,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 // 压缩指定目录为指定的zip文件
@@ -15,7 +20,8 @@ func Zip(srcFileorpath string, zipPathFile string) error {
 	}
 	defer zipFile.Close()
 
-	lenPrefix := Len(filepath.Dir(srcFileorpath)) // 绝对路径除去末尾目录名后的长度
+	// lenPrefix := Len(filepath.Dir(srcFileorpath)) // 绝对路径除去末尾目录名后的长度
+	lenPrefix := Len(srcFileorpath) // 绝对路径除去末尾目录名后的长度
 
 	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
@@ -23,6 +29,9 @@ func Zip(srcFileorpath string, zipPathFile string) error {
 	filepath.Walk(srcFileorpath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
+		}
+		if srcFileorpath == path {
+			return nil
 		}
 
 		header, err := zip.FileInfoHeader(info)
@@ -69,7 +78,12 @@ func UnZip(zipFile string, destPath string) error {
 	defer zipReader.Close()
 
 	for _, f := range zipReader.File {
-		path := filepath.Join(destPath, f.Name)
+		fName, err := decodeGBK(f.Name)
+		if err != nil {
+			fName = f.Name
+		}
+
+		path := filepath.Join(destPath, fName)
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(path, os.ModePerm)
 		} else {
@@ -96,4 +110,24 @@ func UnZip(zipFile string, destPath string) error {
 		}
 	}
 	return nil
+}
+
+// decodeGBK 解码中文目录名
+func decodeGBK(input string) (string, error) {
+	if notContainsChinese(input) {
+		return input, nil
+	}
+
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	reader := transform.NewReader(strings.NewReader(input), decoder)
+	decoded, err := io.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+	return string(decoded), nil
+}
+
+func notContainsChinese(input string) bool {
+	regex := regexp.MustCompile("[\u4e00-\u9fa5]") // 匹配中文字符的正则表达式
+	return regex.MatchString(input)
 }
