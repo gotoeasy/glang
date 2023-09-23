@@ -5,5 +5,5 @@ import (
 )
 
 func Test_win(t *testing.T) {
-	Info(CreateRegistry4UrlProtocol("zzzz", "ssssssssssssss", "C:\\Windows\\notepad.exe"))
+	Info(RegistrySetUrlProtocol("zzzz", "aaaaaaa", "C:\\Windows\\System32\\cmd.exe"))
 }
