@@ -99,3 +99,8 @@ func (f *FasthttpServer) Start() error {
 	}
 	return f.server.ListenAndServe(addr)
 }
+
+// 关闭服务
+func (f *FasthttpServer) Shutdown() error {
+	return f.server.Shutdown()
+}
