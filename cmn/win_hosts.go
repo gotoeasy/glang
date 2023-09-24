@@ -1,5 +1,10 @@
 package cmn
 
+import (
+	"os"
+	"path/filepath"
+)
+
 // 在 C:/Windows/System32/drivers/etc/hosts 中添加指定映射
 func HostsAddDomain(ip string, domain string) error {
 	hostsfile := "C:\\Windows\\System32\\drivers\\etc\\hosts"
@@ -18,4 +23,13 @@ func HostsAddDomain(ip string, domain string) error {
 
 	// 首行添加映射
 	return WriteFileString(hostsfile, ip+"    "+domain+"\r\n"+txt)
+}
+
+func GetUserHomeDir() string {
+	dir, _ := os.UserHomeDir()
+	return dir
+}
+
+func GetUserStartupDir() string {
+	return filepath.Join(GetUserHomeDir(), `AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`)
 }
