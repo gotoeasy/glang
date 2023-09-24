@@ -65,17 +65,57 @@ func CopyFile(srcFilePath string, dstFilePath string) error {
 	}
 	defer distFile.Close()
 
-	var tmp = make([]byte, 1024*4)
-	for {
-		n, err := srcFile.Read(tmp)
-		distFile.Write(tmp[:n])
-		if err != nil {
-			if err == io.EOF {
-				return nil
+	// 复制文件内容
+	_, err = io.Copy(distFile, srcFile)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+// 复制目录（源目录中的文件和子目录，复制到目标目录，目标目录不存在时自动创建）
+func CopyDir(srcDir, dstDir string) error {
+	// 创建目标目录
+	err := os.MkdirAll(dstDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	// 打开源目录
+	dir, err := os.Open(srcDir)
+	if err != nil {
+		return err
+	}
+	defer dir.Close()
+
+	// 读取源目录中的文件和子目录
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		return err
+	}
+
+	// 逐个处理文件和子目录
+	for _, fileInfo := range fileInfos {
+		srcPath := filepath.Join(srcDir, fileInfo.Name())
+		dstPath := filepath.Join(dstDir, fileInfo.Name())
+
+		if fileInfo.IsDir() {
+			// 如果是子目录，递归复制
+			err = CopyDir(srcPath, dstPath)
+			if err != nil {
+				return err
 			}
-			return err
+		} else {
+			// 如果是文件，复制文件内容
+			err = CopyFile(srcPath, dstPath)
+			if err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
 }
 
 // 写文件（指定目录不存在时先创建，不含目录时存当前目录）
