@@ -10,6 +10,7 @@ type FasthttpServer struct {
 	router       *fasthttprouter.Router
 	server       *fasthttp.Server
 	port         string
+	cors         bool
 	tsl          bool
 	certData     []byte
 	keyData      []byte
@@ -20,9 +21,10 @@ type FasthttpServer struct {
 type GlobalBeforeRequestHandler func(ctx *fasthttp.RequestCtx) bool
 
 // 创建Fasthttp服务器对象
-func NewFasthttpServer() *FasthttpServer {
+func NewFasthttpServer(enableCors ...bool) *FasthttpServer {
 	return &FasthttpServer{
 		router: fasthttprouter.New(),
+		cors:   len(enableCors) > 0 && enableCors[0],
 	}
 }
 
@@ -46,11 +48,33 @@ func (f *FasthttpServer) HandleGet(path string, handle fasthttp.RequestHandler) 
 
 // 注册指定方法的请求控制器
 func (f *FasthttpServer) Handle(method string, path string, handle fasthttp.RequestHandler) *FasthttpServer {
-	f.router.Handle(method, path, func(ctx *fasthttp.RequestCtx) {
-		if f.beforeHandle == nil || f.beforeHandle(ctx) {
-			handle(ctx)
+	if f.cors {
+		if method != "OPTIONS" {
+			f.router.Handle("OPTIONS", path, func(ctx *fasthttp.RequestCtx) {
+				ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+				ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE")
+				ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+				ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
+				ctx.SetStatusCode(200)
+			})
 		}
-	})
+		f.router.Handle(method, path, func(ctx *fasthttp.RequestCtx) {
+			ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+			ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE")
+			ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+			ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
+			if f.beforeHandle == nil || f.beforeHandle(ctx) {
+				handle(ctx)
+			}
+		})
+	} else {
+		f.router.Handle(method, path, func(ctx *fasthttp.RequestCtx) {
+			if f.beforeHandle == nil || f.beforeHandle(ctx) {
+				handle(ctx)
+			}
+		})
+	}
+
 	return f
 }
 
