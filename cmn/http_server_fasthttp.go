@@ -7,14 +7,15 @@ import (
 
 // Fasthttp服务器结构体
 type FasthttpServer struct {
-	router       *fasthttprouter.Router
-	server       *fasthttp.Server
-	port         string
-	cors         bool
-	tsl          bool
-	certData     []byte
-	keyData      []byte
-	beforeHandle GlobalBeforeRequestHandler
+	router        *fasthttprouter.Router
+	server        *fasthttp.Server
+	port          string
+	cors          bool
+	tsl           bool
+	certData      []byte
+	keyData       []byte
+	beforeHandle  GlobalBeforeRequestHandler
+	finallyHandle GlobalBeforeRequestHandler
 }
 
 // 全局前置拦截器
@@ -31,6 +32,12 @@ func NewFasthttpServer(enableCors ...bool) *FasthttpServer {
 // 注册全局前置拦截器（前置拦截器返回true时才会继续正常处理后续请求）
 func (f *FasthttpServer) BeforeRequestHandle(beforeHandle GlobalBeforeRequestHandler) *FasthttpServer {
 	f.beforeHandle = beforeHandle
+	return f
+}
+
+// 注册全局后置拦截器
+func (f *FasthttpServer) FinallyRequestHandle(finallyHandle GlobalBeforeRequestHandler) *FasthttpServer {
+	f.finallyHandle = finallyHandle
 	return f
 }
 
@@ -82,11 +89,17 @@ func (f *FasthttpServer) Handle(method string, path string, handle fasthttp.Requ
 			if f.beforeHandle == nil || f.beforeHandle(ctx) {
 				handle(ctx)
 			}
+			if f.finallyHandle != nil {
+				f.finallyHandle(ctx)
+			}
 		})
 	} else {
 		f.router.Handle(method, path, func(ctx *fasthttp.RequestCtx) {
 			if f.beforeHandle == nil || f.beforeHandle(ctx) {
 				handle(ctx)
+			}
+			if f.finallyHandle != nil {
+				f.finallyHandle(ctx)
 			}
 		})
 	}
