@@ -52,7 +52,9 @@ func (f *FasthttpServer) HandleNotFound(handle fasthttp.RequestHandler) *Fasthtt
 			c.SetStatusCode(200)
 			return
 		}
-		handle(c)
+		if f.beforeHandle == nil || f.beforeHandle(c) {
+			handle(c)
+		}
 	}
 	return f
 }
