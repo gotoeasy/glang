@@ -41,7 +41,8 @@ func HttpUploadFile(url string, filePath string, headers ...string) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "multipart/form-data")
+	// req.Header.Set("Content-Type", "multipart/form-data")
+	req.Header.Set("Content-Type", writer.FormDataContentType())
 	for i, max := 0, len(headers); i < max; i++ {
 		strs := Split(headers[i], ":")
 		if len(strs) > 1 {
@@ -49,7 +50,7 @@ func HttpUploadFile(url string, filePath string, headers ...string) ([]byte, err
 		}
 	}
 
-	client := &http.Client{}
+	client := http.DefaultClient
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
