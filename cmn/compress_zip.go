@@ -26,7 +26,7 @@ func Zip(srcFileorpath string, zipPathFile string) error {
 	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
 
-	filepath.Walk(srcFileorpath, func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(srcFileorpath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,6 @@ func Zip(srcFileorpath string, zipPathFile string) error {
 		return nil
 	})
 
-	return nil
 }
 
 // 解压指定zip文件
