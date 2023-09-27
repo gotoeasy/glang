@@ -127,7 +127,8 @@ func StringToBytes(s string) []byte {
 
 // []byte 转 string
 func BytesToString(b []byte) string {
-	return *(*string)(unsafe.Pointer(&b))
+	return string(b)
+	// return *(*string)(unsafe.Pointer(&b))
 }
 
 // string 转 bool
