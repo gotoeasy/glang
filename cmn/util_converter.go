@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"io"
 	"strconv"
-	"unsafe"
 )
 
 // string 转 int
@@ -117,12 +116,13 @@ func BytesToUint64(bytes []byte) uint64 {
 
 // string 转 []byte
 func StringToBytes(s string) []byte {
-	return *(*[]byte)(unsafe.Pointer(
-		&struct {
-			string
-			Cap int
-		}{s, len(s)},
-	))
+	return []byte(s)
+	// return *(*[]byte)(unsafe.Pointer(
+	// 	&struct {
+	// 		string
+	// 		Cap int
+	// 	}{s, len(s)},
+	// ))
 }
 
 // []byte 转 string

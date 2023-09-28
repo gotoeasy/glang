@@ -20,7 +20,8 @@ func TarDir(directory string, tarfilename string) error {
 		return err
 	}
 
-	lenPrefix := Len(filepath.Dir(dir)) // 绝对路径除去末尾目录名后的长度
+	// lenPrefix := Len(filepath.Dir(dir)) // 绝对路径除去末尾目录名后的长度
+	lenPrefix := Len(dir) // 绝对路径除去末尾目录名后的长度
 
 	// 创建文件
 	os.MkdirAll(filepath.Dir(tarfilename), 0777)                      // 建目录确保目录存在
