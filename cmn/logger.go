@@ -9,9 +9,7 @@ var logLevel int
 
 // 设定日志级别（trace/debug/info/warn/error/fatal）
 func SetLogLevel(level string) {
-	if EqualsIngoreCase("TRACE", level) {
-		logLevel = 0
-	} else if EqualsIngoreCase("DEBUG", level) {
+	if EqualsIngoreCase("DEBUG", level) {
 		logLevel = 1
 	} else if EqualsIngoreCase("INFO", level) {
 		logLevel = 2
@@ -19,16 +17,6 @@ func SetLogLevel(level string) {
 		logLevel = 3
 	} else if EqualsIngoreCase("ERROR", level) {
 		logLevel = 4
-	} else if EqualsIngoreCase("FATAL", level) {
-		logLevel = 5
-	}
-}
-
-// 打印Trace级别日志
-func Trace(v ...any) {
-	glc.Trace(v...)
-	if logLevel <= 0 {
-		log.Println(append([]any{"TRACE"}, v...)...)
 	}
 }
 
@@ -62,21 +50,6 @@ func Error(v ...any) {
 	if logLevel <= 4 {
 		log.Println(append([]any{"ERROR"}, v...)...)
 	}
-}
-
-// 打印Fatal级别日志
-func Fatal(v ...any) {
-	glc.Fatal(v...)
-	if logLevel <= 5 {
-		log.Println(append([]any{"FATAL"}, v...)...)
-	}
-}
-
-// 打印Fatal级别日志，然后退出
-func Fatalln(v ...any) {
-	glc.Fatal(v...)
-	log.Fatalln(append([]any{"FATAL"}, v...)...)
-
 }
 
 // 打印日志

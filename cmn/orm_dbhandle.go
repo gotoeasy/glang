@@ -510,7 +510,7 @@ func (d *DbHandle) fetchToMapArray(mapType map[string]string, rows *sql.Rows, on
 			} else if mapType[column] == "float64" || mapType[DbFieldName(column)] == "float64" {
 				rowMap[column] = dbValue.Float64()
 			} else {
-				Trace("未支持的结构体字段类型")
+				Warn("未支持的结构体字段类型")
 				rowMap[column] = dbValue
 			}
 		}

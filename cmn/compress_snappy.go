@@ -11,7 +11,7 @@ func Compress(srcBytes []byte) []byte {
 func UnCompress(snappyEncodedBytes []byte) []byte {
 	bt, err := snappy.Decode(nil, snappyEncodedBytes)
 	if err != nil {
-		Trace(err)
+		Warn(err)
 		return snappyEncodedBytes
 	}
 	return bt
