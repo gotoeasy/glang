@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// 随机数
+// 随机数 int
 func RandomInt(min, max int) int {
 	if min == max {
 		return min
@@ -17,12 +17,12 @@ func RandomInt(min, max int) int {
 	return r.Intn(max-min) + min
 }
 
-// 随机数
+// 随机数 uint32
 func RandomUint32() uint32 {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Uint32()
 }
 
-// 随机数
+// 随机数 uint64
 func RandomUint64() uint64 {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Uint64()
 }
@@ -38,4 +38,9 @@ func RandomString(length int) string {
 		result = append(result, bytes[r.Intn(len(bytes))])
 	}
 	return BytesToString(result)
+}
+
+// 随机哈希数字符串
+func RandomHashString() string {
+	return HashString(ULID() + RandomString(10))
 }

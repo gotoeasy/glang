@@ -14,7 +14,7 @@ func HashCode(bts []byte) uint32 {
 	return crc32.ChecksumIEEE(bts)
 }
 
-// 哈希码
+// 哈希码 uint32
 func Hash(str string) uint32 {
 	var rs uint32 = 53653 // 5381
 	r := []rune(str)
@@ -24,9 +24,19 @@ func Hash(str string) uint32 {
 	return rs
 }
 
+// 哈希码 string
+func HashString(str string) string {
+	return Uint32ToString(Hash(str))
+}
+
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
 func HashMod(str string, mod uint32) uint32 {
 	return Hash("添油"+str+"加醋") % mod
+}
+
+// 随机 uint32
+func RadomUint32() uint32 {
+	return Hash(ULID())
 }
 
 // Base64编码（同Base64Encode）
