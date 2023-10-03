@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
@@ -100,7 +101,10 @@ func (p *P2pRelayHost) SetStreamHandler(uri string, handler network.StreamHandle
 }
 
 // 向目标节点发起请求并返回响应结果
-func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []byte) ([]byte, error) {
+func (p *P2pRelayHost) RequestWithTimeout(targetHostAddr string, uri string, dataBytes []byte, timeout time.Duration) ([]byte, error) {
+	// 使用WithTimeout创建一个有超时限制的context
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel() // 保证超时后释放资源
 
 	// 连接到目标节点
 	targetAddr, err := multiaddr.NewMultiaddr(targetHostAddr)
@@ -111,14 +115,14 @@ func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []by
 	if err != nil {
 		return nil, err
 	}
-	if err := p.Host.Connect(context.Background(), *targetAddrInfo); err != nil {
+	if err := p.Host.Connect(ctx, *targetAddrInfo); err != nil {
 		return nil, err
 	}
 
 	peerid := targetAddrInfo.ID.String()
 
 	// 新建一个临时的会话流
-	stream, err := p.Host.NewStream(network.WithUseTransient(context.Background(), "简单的会话通信"), peer.ID(peerid), protocol.ID(uri))
+	stream, err := p.Host.NewStream(ctx, peer.ID(peerid), protocol.ID(uri))
 	if err != nil {
 		return nil, err
 	}
