@@ -125,16 +125,16 @@ func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []by
 	defer stream.Close()
 
 	// 发送请求数据
-	err = writeBytesToStream(stream, dataBytes)
+	err = WriteBytesToStream(stream, dataBytes)
 	if err != nil {
 		return nil, err
 	}
 
 	// 接收请求数据
-	return readBytesFromStream(stream)
+	return ReadBytesFromStream(stream)
 }
 
-func writeBytesToStream(stream network.Stream, dataBytes []byte) error {
+func WriteBytesToStream(stream network.Stream, dataBytes []byte) error {
 
 	// 写长度
 	requestLength := StringToUint32(IntToString(len(dataBytes)), 0)
@@ -151,7 +151,7 @@ func writeBytesToStream(stream network.Stream, dataBytes []byte) error {
 	return nil
 }
 
-func readBytesFromStream(stream network.Stream) ([]byte, error) {
+func ReadBytesFromStream(stream network.Stream) ([]byte, error) {
 	// 读长度
 	prefix := make([]byte, 4)
 	_, err := io.ReadFull(stream, prefix)
