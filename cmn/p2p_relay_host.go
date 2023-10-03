@@ -79,29 +79,13 @@ func (p *P2pRelayHost) ConnectRelayHost(relayHostAddr string) error {
 	return nil
 }
 
-// 当前节点作为客户端连接到指定节点 /ip4/{ip}/tcp/{port}/p2p/{peerid}, 或 /p2p/{peerid}
-func (p *P2pRelayHost) ConnectHost(hostAddr string) error {
-	serverAddr, err := multiaddr.NewMultiaddr(hostAddr)
-	if err != nil {
-		return err
-	}
-	serverInfo, err := peer.AddrInfoFromP2pAddr(serverAddr)
-	if err != nil {
-		return err
-	}
-	if err := p.Host.Connect(context.Background(), *serverInfo); err != nil { // 建立连接
-		return err
-	}
-	return nil
-}
-
 // 设定处理器
 func (p *P2pRelayHost) SetStreamHandler(uri string, handler network.StreamHandler) {
 	p.Host.SetStreamHandler(protocol.ID(uri), handler)
 }
 
-// 向目标节点发起请求并返回响应结果
-func (p *P2pRelayHost) RequestWithTimeout(targetHostAddr string, uri string, dataBytes []byte, timeout time.Duration) ([]byte, error) {
+// 向目标节点发起请求并返回响应结果，地址通常为 /ip4/{ip}/tcp/{port}/p2p/{peerid} 或 /p2p/{relayPeerid}/p2p-circuit/p2p/{peerid} 或 /p2p/{peerid}
+func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []byte, timeout time.Duration) ([]byte, error) {
 	// 使用WithTimeout创建一个有超时限制的context
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel() // 保证超时后释放资源
@@ -119,10 +103,8 @@ func (p *P2pRelayHost) RequestWithTimeout(targetHostAddr string, uri string, dat
 		return nil, err
 	}
 
-	peerid := targetAddrInfo.ID.String()
-
 	// 新建一个临时的会话流
-	stream, err := p.Host.NewStream(ctx, peer.ID(peerid), protocol.ID(uri))
+	stream, err := p.Host.NewStream(ctx, targetAddrInfo.ID, protocol.ID(uri))
 	if err != nil {
 		return nil, err
 	}
