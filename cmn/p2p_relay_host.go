@@ -23,7 +23,7 @@ type P2pRelayHost struct {
 
 // 新建中继P2P节点
 func NewP2pRelayHost(key string, port string) (*P2pRelayHost, error) {
-	prvKey, _, err := crypto.GenerateEd25519Key(strings.NewReader("funcNewP2pRelayHostParameterKey:" + key))
+	prvKey, _, err := crypto.GenerateEd25519Key(strings.NewReader(key + "-funcNewP2pRelayHostParameterKey"))
 	if err != nil {
 		return nil, err
 	}
