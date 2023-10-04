@@ -120,6 +120,7 @@ func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []by
 	return ReadBytesFromStream(stream)
 }
 
+// 写流
 func WriteBytesToStream(stream network.Stream, dataBytes []byte) error {
 
 	// 写长度
@@ -137,6 +138,7 @@ func WriteBytesToStream(stream network.Stream, dataBytes []byte) error {
 	return nil
 }
 
+// 读流
 func ReadBytesFromStream(stream network.Stream) ([]byte, error) {
 	// 读长度
 	prefix := make([]byte, 4)
