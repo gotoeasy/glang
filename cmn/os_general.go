@@ -4,7 +4,6 @@ import (
 	"net"
 	"os/exec"
 	"strings"
-	"syscall"
 )
 
 var localIpAddres string
@@ -87,7 +86,6 @@ func GetLocalHostName() string {
 
 func getHostname() string {
 	cmd := exec.Command("hostname")
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
