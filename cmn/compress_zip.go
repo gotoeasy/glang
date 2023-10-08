@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -41,6 +42,7 @@ func Zip(srcFileOrPath string, zipPathFile string) error {
 		}
 
 		header.Name = SubString(path, lenPrefix+1, Len(path))
+		header.Extra = StringToBytes("file-size:" + strconv.FormatInt(info.Size(), 10) + ";custom:true ")
 
 		if info.IsDir() {
 			header.Name += "/"
