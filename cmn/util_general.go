@@ -30,7 +30,7 @@ func NormalizeVer(ver string) string {
 		return ver
 	}
 	mainVer := ReplaceAll(ary1[0], "v", "")
-	if IsDigit(ary1[1]) {
+	if IsDigit(mainVer) {
 		ary1[0] = "v" + Right(IntToString(100+StringToInt(mainVer, 0)), 2)
 	}
 	ary1[1] = Right(IntToString(1000+StringToInt(ary1[1], 0)), 3)

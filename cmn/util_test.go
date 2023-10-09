@@ -7,6 +7,7 @@ import (
 
 func Test_chk(t *testing.T) {
 	Info(IsEmail("1@1.1"))
+	Info(NormalizeVer("v1.2.3"))
 }
 func Test_uid(t *testing.T) {
 	for i := 0; i < 10; i++ {
