@@ -16,6 +16,7 @@ import (
 // 压缩指定目录为指定的zip文件
 func Zip(srcFileOrPath string, zipPathFile string) error {
 	srcFileorpath := strings.ReplaceAll(srcFileOrPath, "\\", "/") // window得这么干！这是个神奇的地方，不信就试
+	MkdirAll(Dir(zipPathFile))
 	zipFile, err := os.Create(zipPathFile)
 	if err != nil {
 		return err

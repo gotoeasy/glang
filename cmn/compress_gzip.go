@@ -13,6 +13,7 @@ func Gzip(srcFile string, gzipFile string) error {
 	if err != nil {
 		return err
 	}
+	MkdirAll(Dir(gzipFile))
 	outFile, err := os.Create(gzipFile)
 	if err != nil {
 		return err

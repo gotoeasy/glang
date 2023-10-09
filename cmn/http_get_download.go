@@ -14,6 +14,7 @@ func HttpDownload(url, saveAsPathFile string) error {
 	}
 	defer response.Body.Close()
 
+	MkdirAll(Dir(saveAsPathFile))
 	file, err := os.Create(saveAsPathFile)
 	if err != nil {
 		return err

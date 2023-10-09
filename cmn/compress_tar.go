@@ -24,7 +24,7 @@ func TarDir(directory string, tarfilename string) error {
 	lenPrefix := Len(dir) // 绝对路径除去末尾目录名后的长度
 
 	// 创建文件
-	os.MkdirAll(filepath.Dir(tarfilename), 0777)                      // 建目录确保目录存在
+	MkdirAll(Dir(tarfilename))                                        // 建目录确保目录存在
 	f, err := os.OpenFile(tarfilename, os.O_WRONLY|os.O_CREATE, 0777) // 建文件
 	if err != nil {
 		return err
