@@ -44,17 +44,22 @@ func (f *FasthttpServer) FinallyRequestHandle(finallyHandle GlobalBeforeRequestH
 // 注册NotFound的请求控制器
 func (f *FasthttpServer) HandleNotFound(handle fasthttp.RequestHandler) *FasthttpServer {
 	f.router.NotFound = func(c *fasthttp.RequestCtx) {
-		if f.cors && BytesToString(c.Method()) == "OPTIONS" {
+		if f.cors {
 			c.Response.Header.Set("Access-Control-Allow-Origin", "*")
 			c.Response.Header.Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE")
 			c.Response.Header.Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 			c.Response.Header.Set("Access-Control-Max-Age", "3600")
-			c.SetStatusCode(200)
-			return
+
+			if BytesToString(c.Method()) == "OPTIONS" {
+				c.SetStatusCode(200)
+				return
+			}
 		}
+
 		if f.beforeHandle == nil || f.beforeHandle(c) {
 			handle(c)
 		}
+
 	}
 	return f
 }

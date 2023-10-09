@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 // 路径分隔符
@@ -15,6 +16,12 @@ func PathSeparator() string {
 // 取文件名，如“abc.txt”
 func FileName(name string) string {
 	return path.Base(ReplaceAll(name, "\\", "/"))
+}
+
+// 取不含扩展名的文件名，如“abc.txt时返回abc”
+func FileNameWithoutExt(name string) string {
+	fileNameWithExtension := FileName(name)
+	return strings.TrimSuffix(fileNameWithExtension, FileExtName(fileNameWithExtension))
 }
 
 // 取文件扩展名，如“.txt”
@@ -116,6 +123,16 @@ func CopyDir(srcDir, dstDir string) error {
 	}
 
 	return nil
+}
+
+// 返回目录，同filepath.Dir(path)
+func Dir(path string) string {
+	return filepath.Dir(path)
+}
+
+// 创建多级目录（存在时不报错）
+func MkdirAll(dir string) error {
+	return os.MkdirAll(dir, os.ModePerm)
 }
 
 // 写文件（指定目录不存在时先创建，不含目录时存当前目录）
