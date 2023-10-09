@@ -22,3 +22,18 @@ func Retry(callback func() error, retryTimes int, duration time.Duration) (err e
 	}
 	return
 }
+
+// 版本号格式转换便于比较大小，格式不符时返回原版本，例 v1.2.3 => v01.002.003
+func NormalizeVer(ver string) string {
+	ary1 := Split(ver, ".")
+	if len(ary1) != 3 || !IsDigit(ary1[1]) || !IsDigit(ary1[2]) {
+		return ver
+	}
+	mainVer := ReplaceAll(ary1[0], "v", "")
+	if IsDigit(ary1[1]) {
+		ary1[0] = "v" + Right(IntToString(100+StringToInt(mainVer, 0)), 2)
+	}
+	ary1[1] = Right(IntToString(1000+StringToInt(ary1[1], 0)), 3)
+	ary1[2] = Right(IntToString(1000+StringToInt(ary1[2], 0)), 3)
+	return Join(ary1, ".")
+}
