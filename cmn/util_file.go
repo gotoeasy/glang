@@ -66,6 +66,7 @@ func CopyFile(srcFilePath string, dstFilePath string) error {
 	}
 	defer srcFile.Close()
 
+	MkdirAll(Dir(dstFilePath))
 	distFile, err := os.Create(dstFilePath)
 	if err != nil {
 		return err
@@ -84,7 +85,7 @@ func CopyFile(srcFilePath string, dstFilePath string) error {
 // 复制目录（源目录中的文件和子目录，复制到目标目录，目标目录不存在时自动创建）
 func CopyDir(srcDir, dstDir string) error {
 	// 创建目标目录
-	err := os.MkdirAll(dstDir, os.ModePerm)
+	err := MkdirAll(dstDir)
 	if err != nil {
 		return err
 	}
