@@ -11,6 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
+	"github.com/libp2p/go-libp2p/p2p/net/swarm"
 	"github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/client"
 	"github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/relay"
 	"github.com/multiformats/go-multiaddr"
@@ -69,6 +70,7 @@ func (p *P2pRelayHost) ConnectRelayHost(relayHostAddr string) error {
 		return err
 	}
 	if err := p.Host.Connect(context.Background(), *serverInfo); err != nil { // 建立连接
+		p.Host.Network().(*swarm.Swarm).Backoff().Clear(serverInfo.ID) // 清除连接失败的缓存
 		return err
 	}
 	_, err = client.Reserve(context.Background(), p.Host, *serverInfo)
