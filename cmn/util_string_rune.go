@@ -240,3 +240,22 @@ func GetSizeInfo(size uint64) string {
 	}
 	return fmt.Sprintf("%.1fK", float64(size)/1024)
 }
+
+// 按容易理解的单位表示时间
+func GetTimeInfo(milliseconds int64) string {
+	seconds := milliseconds / 1000
+	minutes := seconds / 60
+	hours := minutes / 60
+
+	if hours > 0 {
+		minutes %= 60
+		return fmt.Sprintf("%d小时%d分", hours, minutes)
+	} else if minutes > 0 {
+		seconds %= 60
+		return fmt.Sprintf("%d分%d秒", minutes, seconds)
+	} else if seconds > 0 {
+		return fmt.Sprintf("%d秒", seconds)
+	}
+
+	return fmt.Sprintf("%d毫秒", milliseconds)
+}

@@ -5,9 +5,8 @@ import (
 	"testing"
 )
 
-func Test_chk(t *testing.T) {
-	Info(IsEmail("1@1.1"))
-	Info(NormalizeVer("v1.2.3"))
+func Test_time(t *testing.T) {
+	Info(GetTimeInfo(610100))
 }
 func Test_uid(t *testing.T) {
 	for i := 0; i < 10; i++ {
@@ -15,6 +14,10 @@ func Test_uid(t *testing.T) {
 	}
 }
 
+func Test_chk(t *testing.T) {
+	Info(IsEmail("1@1.1"))
+	Info(NormalizeVer("v1.2.3"))
+}
 func Test_str(t *testing.T) {
 	Info(Float64ToStringRoundDown(1234567890123456, 2))
 	Info(Float64ToStringRoundDown(999999999999.999, 2))
