@@ -20,3 +20,7 @@ func Test_measures(t *testing.T) {
 	Info(MeasureHost())
 	Info(MeasureSummary())
 }
+
+func Test_measures2(t *testing.T) {
+	Info(MeasureDiskFreeSpace("d:/Csa\\s/a/f"))
+}

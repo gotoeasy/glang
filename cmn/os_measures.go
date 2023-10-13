@@ -1,6 +1,8 @@
 package cmn
 
 import (
+	"errors"
+	"path/filepath"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -57,6 +59,49 @@ func MeasureDisk() (total uint64, used uint64, free uint64, usePercent float64) 
 	used = diskInfo.Used
 	free = diskInfo.Free
 	usePercent = diskInfo.UsedPercent
+	return
+}
+
+// 检测磁盘(指定路径所在磁盘的剩余空间)
+func MeasureDiskFreeSpace(path string) string {
+	_, _, free, _, err := MeasureDiskByPath(path)
+	if err != nil {
+		return ""
+	}
+	return GetSizeInfo(free)
+}
+
+// 检测磁盘(指定路径所在磁盘)
+func MeasureDiskByPath(path string) (total uint64, used uint64, free uint64, usePercent float64, err error) {
+
+	rootPath := path
+	if IsWin() {
+		rootPath = ToUpper(filepath.VolumeName(path))
+	}
+
+	partitions, e := disk.Partitions(false)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for _, p := range partitions {
+		if Startwiths(rootPath, p.Mountpoint) {
+			diskInfo, e := disk.Usage(p.Mountpoint)
+			if e != nil {
+				err = e
+				return
+			}
+
+			total = diskInfo.Total
+			used = diskInfo.Used
+			free = diskInfo.Free
+			usePercent = diskInfo.UsedPercent
+			return
+		}
+	}
+
+	err = errors.New("找不到指定路径相应的磁盘")
 	return
 }
 

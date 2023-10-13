@@ -75,6 +75,7 @@ func (p *P2pRelayHost) ConnectRelayHost(relayHostAddr string) error {
 	}
 	_, err = client.Reserve(context.Background(), p.Host, *serverInfo)
 	if err != nil {
+		p.Host.Network().(*swarm.Swarm).Backoff().Clear(serverInfo.ID) // 清除连接失败的缓存
 		return err
 	}
 	return nil

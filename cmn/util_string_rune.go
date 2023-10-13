@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
@@ -227,4 +228,15 @@ func UnderlineToCamel(str string) string {
 		rs += Titlelize(ary[i])
 	}
 	return rs
+}
+
+// 按K或M或G单位显示，保留1位小数
+func GetSizeInfo(size uint64) string {
+	if size > 1024*1024*1024 {
+		return fmt.Sprintf("%.1fG", float64(size)/1024/1024/1024)
+	}
+	if size > 1024*1024 {
+		return fmt.Sprintf("%.1fM", float64(size)/1024/1024)
+	}
+	return fmt.Sprintf("%.1fK", float64(size)/1024)
 }
