@@ -35,10 +35,7 @@ func (d *GlcData) ToJson() string {
 //
 // 日志中心见 https://github.com/gotoeasy/glogcenter
 type GlcClient struct {
-	apiUrl   string
-	system   string
-	apiKey   string
-	enable   bool
+	opt      *GlcOptions
 	stop     bool
 	logLevel int
 	logChan  chan *GlcData // 用chan控制日志发送顺序
@@ -46,11 +43,15 @@ type GlcClient struct {
 
 // 日志中心选项
 type GlcOptions struct {
-	ApiUrl   string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
-	System   string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
-	ApiKey   string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
-	Enable   bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
-	LogLevel string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
+	ApiUrl     string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
+	System     string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
+	ApiKey     string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
+	Enable     bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
+	LogLevel   string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
+	ServerName string // 服务器名
+	ServerIp   string // 服务器IP
+	ClientIp   string // 客户端IP
+
 }
 
 var _glc *GlcClient
@@ -79,10 +80,7 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 	}
 
 	glc := &GlcClient{
-		apiUrl:  o.ApiUrl,
-		system:  o.System,
-		apiKey:  o.ApiKey,
-		enable:  o.Enable,
+		opt:     o,
 		logChan: make(chan *GlcData, 1024),
 	}
 
@@ -99,7 +97,7 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 	go func() {
 		for {
 			ldm := <-glc.logChan
-			FasthttpPostJson(glc.apiUrl, ldm.ToJson(), glc.apiKey)
+			FasthttpPostJson(glc.opt.ApiUrl, ldm.ToJson(), glc.opt.ApiKey)
 		}
 	}()
 
@@ -120,7 +118,7 @@ func (g *GlcClient) Debug(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"DEBUG"}, params...)...)
 		// GLC日志
-		if !g.stop && g.enable {
+		if !g.stop && g.opt.Enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -139,7 +137,7 @@ func (g *GlcClient) Info(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"INFO"}, params...)...)
 		// GLC日志
-		if !g.stop && g.enable {
+		if !g.stop && g.opt.Enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -158,7 +156,7 @@ func (g *GlcClient) Warn(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"WARN"}, params...)...)
 		// GLC日志
-		if !g.stop && g.enable {
+		if !g.stop && g.opt.Enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -177,7 +175,7 @@ func (g *GlcClient) Error(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"ERROR"}, params...)...)
 		// GLC日志
-		if !g.stop && g.enable {
+		if !g.stop && g.opt.Enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -210,7 +208,7 @@ func (g *GlcClient) print(params []any, ldm *GlcData) {
 
 	// 其他字段检查补填
 	if ldm.System == "" {
-		ldm.System = g.system
+		ldm.System = g.opt.System
 	}
 	ldm.Date = Now()
 	if ldm.ServerIp == "" {
@@ -218,6 +216,9 @@ func (g *GlcClient) print(params []any, ldm *GlcData) {
 	}
 	if ldm.ServerName == "" {
 		ldm.ServerName = GetLocalHostName()
+	}
+	if ldm.ClientIp == "" {
+		ldm.ClientIp = GetPreferredLocalIPv4()
 	}
 	if ldm.TraceId == "" {
 		ldm.TraceId = HashString(ULID())
