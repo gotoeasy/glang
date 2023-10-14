@@ -53,7 +53,7 @@ type GlcOptions struct {
 	LogLevel string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
 }
 
-var glc *GlcClient
+var _glc *GlcClient
 
 // 创建日志中心客户端对象
 func NewGlcClient(o *GlcOptions) *GlcClient {
@@ -108,7 +108,7 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 
 // 设定GLC日志中心客户端
 func SetGlcClient(glcClient *GlcClient) {
-	glc = glcClient
+	_glc = glcClient
 }
 
 // 发送Debug级别日志到日志中心
@@ -133,9 +133,9 @@ func (g *GlcClient) Debug(v ...any) {
 // 发送Info级别日志到日志中心
 func (g *GlcClient) Info(v ...any) {
 	params, ldm := logParams(v...)
-	if glc == nil {
+	if g == nil {
 		log.Println(append([]any{"INFO"}, params...)...)
-	} else if glc.logLevel <= 2 {
+	} else if g.logLevel <= 2 {
 		// 控制台日志
 		log.Println(append([]any{"INFO"}, params...)...)
 		// GLC日志
@@ -152,9 +152,9 @@ func (g *GlcClient) Info(v ...any) {
 // 发送Warn级别日志到日志中心
 func (g *GlcClient) Warn(v ...any) {
 	params, ldm := logParams(v...)
-	if glc == nil {
+	if g == nil {
 		log.Println(append([]any{"WARN"}, params...)...)
-	} else if glc.logLevel <= 3 {
+	} else if g.logLevel <= 3 {
 		// 控制台日志
 		log.Println(append([]any{"WARN"}, params...)...)
 		// GLC日志
@@ -171,9 +171,9 @@ func (g *GlcClient) Warn(v ...any) {
 // 发送Error级别日志到日志中心
 func (g *GlcClient) Error(v ...any) {
 	params, ldm := logParams(v...)
-	if glc == nil {
+	if g == nil {
 		log.Println(append([]any{"ERROR"}, params...)...)
-	} else if glc.logLevel <= 4 {
+	} else if g.logLevel <= 4 {
 		// 控制台日志
 		log.Println(append([]any{"ERROR"}, params...)...)
 		// GLC日志
@@ -228,11 +228,13 @@ func (g *GlcClient) print(params []any, ldm *GlcData) {
 
 // 停止接收新的日志并等待日志全部输出完成
 func (g *GlcClient) WaitFinish() {
-	g.stop = true
-	for {
-		if len(g.logChan) <= 0 {
-			break
+	if g != nil {
+		g.stop = true
+		for {
+			if len(g.logChan) <= 0 {
+				break
+			}
+			time.Sleep(time.Millisecond * 10)
 		}
-		time.Sleep(time.Millisecond * 10)
 	}
 }
