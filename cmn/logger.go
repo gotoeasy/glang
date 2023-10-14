@@ -19,3 +19,8 @@ func Warn(v ...any) {
 func Error(v ...any) {
 	glc.Error(v...)
 }
+
+// 停止接收新的日志并等待日志全部输出完成
+func WaitGlcFinish() {
+	glc.WaitFinish()
+}

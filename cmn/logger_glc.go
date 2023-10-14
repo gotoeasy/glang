@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 )
 
 // 日志接口数据结构体
@@ -38,6 +39,7 @@ type GlcClient struct {
 	system   string
 	apiKey   string
 	enable   bool
+	stop     bool
 	logLevel int
 	logChan  chan *GlcData // 用chan控制日志发送顺序
 }
@@ -112,13 +114,13 @@ func SetGlcClient(glcClient *GlcClient) {
 // 发送Debug级别日志到日志中心
 func (g *GlcClient) Debug(v ...any) {
 	params, ldm := logParams(v...)
-	if glc == nil {
+	if g == nil {
 		log.Println(append([]any{"DEBUG"}, params...)...)
-	} else if glc.logLevel <= 1 {
+	} else if g.logLevel <= 1 {
 		// 控制台日志
 		log.Println(append([]any{"DEBUG"}, params...)...)
 		// GLC日志
-		if glc.enable {
+		if !g.stop && g.enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -137,7 +139,7 @@ func (g *GlcClient) Info(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"INFO"}, params...)...)
 		// GLC日志
-		if glc.enable {
+		if !g.stop && g.enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -156,7 +158,7 @@ func (g *GlcClient) Warn(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"WARN"}, params...)...)
 		// GLC日志
-		if glc.enable {
+		if !g.stop && g.enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -175,7 +177,7 @@ func (g *GlcClient) Error(v ...any) {
 		// 控制台日志
 		log.Println(append([]any{"ERROR"}, params...)...)
 		// GLC日志
-		if glc.enable {
+		if !g.stop && g.enable {
 			if ldm == nil {
 				ldm = &GlcData{}
 			}
@@ -222,4 +224,15 @@ func (g *GlcClient) print(params []any, ldm *GlcData) {
 	}
 
 	g.logChan <- ldm
+}
+
+// 停止接收新的日志并等待日志全部输出完成
+func (g *GlcClient) WaitFinish() {
+	g.stop = true
+	for {
+		if len(g.logChan) <= 0 {
+			break
+		}
+		time.Sleep(time.Millisecond * 10)
+	}
 }
