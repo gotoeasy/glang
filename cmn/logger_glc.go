@@ -3,10 +3,12 @@ package cmn
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"reflect"
 )
 
 // 日志接口数据结构体
-type LogDataModel struct {
+type GlcData struct {
 	Text       string `json:"text,omitempty"`       // 【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象
 	Date       string `json:"date,omitempty"`       // 日期（格式YYYY-MM-DD HH:MM:SS.SSS）
 	System     string `json:"system,omitempty"`     // 系统名
@@ -21,7 +23,9 @@ type LogDataModel struct {
 	Operation  string `json:"action,omitempty"`     // 操作
 }
 
-func (d *LogDataModel) ToJson() string {
+var ldmType reflect.Type = reflect.TypeOf(&GlcData{})
+
+func (d *GlcData) ToJson() string {
 	bt, _ := json.Marshal(d)
 	return BytesToString(bt)
 }
@@ -29,49 +33,55 @@ func (d *LogDataModel) ToJson() string {
 // 日志中心客户端结构体
 //
 // 日志中心见 https://github.com/gotoeasy/glogcenter
-type GLogCenterClient struct {
+type GlcClient struct {
 	apiUrl   string
 	system   string
 	apiKey   string
 	enable   bool
 	logLevel int
-	logChan  chan string // 用chan控制日志发送顺序
+	logChan  chan *GlcData // 用chan控制日志发送顺序
 }
 
 // 日志中心选项
 type GlcOptions struct {
-	ApiUrl   string // 日志中心的添加日志接口地址
-	System   string // 系统名（对应日志中心检索页面的分类栏）
-	ApiKey   string // 日志中心的ApiKey
-	Enable   bool   // 是否开启发送到日志中心
-	LogLevel string // 日志级别（trace/debug/info/warn/error/fatal）
+	ApiUrl   string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
+	System   string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
+	ApiKey   string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
+	Enable   bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
+	LogLevel string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
 }
 
-var glc *GLogCenterClient
-
-// 按环境编配配置初始化glc对象，方便开箱即用，外部使用时可通过SetLogCenterClient重新设定
-func init() {
-	SetLogCenterClient(NewGLogCenterClient(&GlcOptions{
-		ApiUrl:   GetEnvStr("GLC_API_URL", ""),
-		System:   GetEnvStr("GLC_SYSTEM", "glang"),
-		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
-		Enable:   GetEnvBool("GLC_ENABLE", false),
-		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "debug"),
-	}))
-}
+var glc *GlcClient
 
 // 创建日志中心客户端对象
-func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
+func NewGlcClient(o *GlcOptions) *GlcClient {
 	if o == nil {
-		o = &GlcOptions{}
+		// 按环境编配配置初始化glc对象
+		o = &GlcOptions{
+			ApiUrl:   GetEnvStr("GLC_API_URL", ""),
+			System:   GetEnvStr("GLC_SYSTEM", "default"),
+			ApiKey:   GetEnvStr("GLC_API_KEY", ""),
+			Enable:   GetEnvBool("GLC_ENABLE", false),
+			LogLevel: GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
+		}
+	} else {
+		if o.ApiUrl == "" {
+			o.ApiUrl = GetEnvStr("GLC_API_URL", "")
+		}
+		if o.System == "" {
+			o.System = GetEnvStr("GLC_SYSTEM", "default")
+		}
+		if o.ApiKey == "" {
+			o.ApiKey = GetEnvStr("GLC_API_KEY", "")
+		}
 	}
 
-	glc := &GLogCenterClient{
+	glc := &GlcClient{
 		apiUrl:  o.ApiUrl,
 		system:  o.System,
 		apiKey:  o.ApiKey,
 		enable:  o.Enable,
-		logChan: make(chan string, 2048),
+		logChan: make(chan *GlcData, 1024),
 	}
 
 	if EqualsIngoreCase("DEBUG", o.LogLevel) {
@@ -82,14 +92,12 @@ func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
 		glc.logLevel = 3
 	} else if EqualsIngoreCase("ERROR", o.LogLevel) {
 		glc.logLevel = 4
-	} else if EqualsIngoreCase("FATAL", o.LogLevel) {
-		logLevel = 5
 	}
 
 	go func() {
 		for {
-			text := <-glc.logChan
-			FasthttpPostJson(glc.apiUrl, text, glc.apiKey)
+			ldm := <-glc.logChan
+			FasthttpPostJson(glc.apiUrl, ldm.ToJson(), glc.apiKey)
 		}
 	}()
 
@@ -97,111 +105,121 @@ func NewGLogCenterClient(o *GlcOptions) *GLogCenterClient {
 }
 
 // 设定GLC日志中心客户端
-func SetLogCenterClient(glcClient *GLogCenterClient) {
+func SetGlcClient(glcClient *GlcClient) {
 	glc = glcClient
 }
 
-// 发送Trace级别日志到日志中心
-func (g *GLogCenterClient) Trace(v ...any) {
-	if glc.enable && glc.logLevel <= 0 {
-		g.print(g.system, "TRACE", "TRACE "+fmt.Sprint(v...))
-	}
-}
-
-// 发送指定系统名的Trace级别日志到日志中心
-func (g *GLogCenterClient) TraceSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 0 {
-		g.print(g.system, "TRACE", "TRACE "+fmt.Sprint(v...))
-	}
-}
-
 // 发送Debug级别日志到日志中心
-func (g *GLogCenterClient) Debug(v ...any) {
-	if glc.enable && glc.logLevel <= 1 {
-		g.print(g.system, "DEBUG", "DEBUG "+fmt.Sprint(v...))
-	}
-}
-
-// 发送Debug级别日志到日志中心
-func (g *GLogCenterClient) DebugSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 1 {
-		g.print(g.system, "DEBUG", "DEBUG "+fmt.Sprint(v...))
+func (g *GlcClient) Debug(v ...any) {
+	params, ldm := logParams(v...)
+	if glc == nil {
+		log.Println(append([]any{"DEBUG"}, params...)...)
+	} else if glc.logLevel <= 1 {
+		// 控制台日志
+		log.Println(append([]any{"DEBUG"}, params...)...)
+		// GLC日志
+		if glc.enable {
+			if ldm == nil {
+				ldm = &GlcData{}
+			}
+			ldm.LogLevel = "DEBUG"
+			g.print(params, ldm)
+		}
 	}
 }
 
 // 发送Info级别日志到日志中心
-func (g *GLogCenterClient) Info(v ...any) {
-	if glc.enable && glc.logLevel <= 2 {
-		g.print(g.system, "INFO", "INFO "+fmt.Sprint(v...))
-	}
-}
-
-// 发送指定系统名的Info级别日志到日志中心
-func (g *GLogCenterClient) InfoSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 2 {
-		g.print(system, "INFO", "INFO "+fmt.Sprint(v...))
+func (g *GlcClient) Info(v ...any) {
+	params, ldm := logParams(v...)
+	if glc == nil {
+		log.Println(append([]any{"INFO"}, params...)...)
+	} else if glc.logLevel <= 2 {
+		// 控制台日志
+		log.Println(append([]any{"INFO"}, params...)...)
+		// GLC日志
+		if glc.enable {
+			if ldm == nil {
+				ldm = &GlcData{}
+			}
+			ldm.LogLevel = "INFO"
+			g.print(params, ldm)
+		}
 	}
 }
 
 // 发送Warn级别日志到日志中心
-func (g *GLogCenterClient) Warn(v ...any) {
-	if glc.enable && glc.logLevel <= 3 {
-		g.print(g.system, "WARN", "WARN "+fmt.Sprint(v...))
-	}
-}
-
-// 发送指定系统名的Warn级别日志到日志中心
-func (g *GLogCenterClient) WarnSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 3 {
-		g.print(system, "WARN", "WARN "+fmt.Sprint(v...))
+func (g *GlcClient) Warn(v ...any) {
+	params, ldm := logParams(v...)
+	if glc == nil {
+		log.Println(append([]any{"WARN"}, params...)...)
+	} else if glc.logLevel <= 3 {
+		// 控制台日志
+		log.Println(append([]any{"WARN"}, params...)...)
+		// GLC日志
+		if glc.enable {
+			if ldm == nil {
+				ldm = &GlcData{}
+			}
+			ldm.LogLevel = "WARN"
+			g.print(params, ldm)
+		}
 	}
 }
 
 // 发送Error级别日志到日志中心
-func (g *GLogCenterClient) Error(v ...any) {
-	if glc.enable && glc.logLevel <= 4 {
-		g.print(g.system, "ERROR", "ERROR "+fmt.Sprint(v...))
+func (g *GlcClient) Error(v ...any) {
+	params, ldm := logParams(v...)
+	if glc == nil {
+		log.Println(append([]any{"ERROR"}, params...)...)
+	} else if glc.logLevel <= 4 {
+		// 控制台日志
+		log.Println(append([]any{"ERROR"}, params...)...)
+		// GLC日志
+		if glc.enable {
+			if ldm == nil {
+				ldm = &GlcData{}
+			}
+			ldm.LogLevel = "ERROR"
+			g.print(params, ldm)
+		}
 	}
 }
 
-// 发送指定系统名的Error级别日志到日志中心
-func (g *GLogCenterClient) ErrorSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 4 {
-		g.print(system, "ERROR", "ERROR "+fmt.Sprint(v...))
+func logParams(v ...any) ([]any, *GlcData) {
+	var ary []any
+	var ldm *GlcData
+	for i := 0; i < len(v); i++ {
+		if v[i] != nil {
+			if reflect.TypeOf(v[i]) == ldmType {
+				ldm = v[i].(*GlcData)
+			} else {
+				ary = append(ary, v[i])
+			}
+		}
 	}
+	return ary, ldm
 }
 
-// 发送Fatal级别日志到日志中心
-func (g *GLogCenterClient) Fatal(v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
-		g.print(g.system, "FATAL", "FATAL "+fmt.Sprint(v...))
-	}
-}
-
-// 发送指定系统名的Fatal级别日志到日志中心
-func (g *GLogCenterClient) FatalSys(system string, v ...any) {
-	if glc.enable && glc.logLevel <= 5 {
-		g.print(system, "FATAL", "FATAL "+fmt.Sprint(v...))
-	}
-}
-
-// 发送日志到日志中心
-func (g *GLogCenterClient) Println(text string) {
-	g.print(g.system, "INFO", text)
-}
-
-func (g *GLogCenterClient) print(system string, logLevel string, text string) {
-	if IsBlank(text) {
-		return
+func (g *GlcClient) print(params []any, ldm *GlcData) {
+	// 日志参数优先
+	if len(params) > 0 {
+		ldm.Text = fmt.Sprint(params...)
 	}
 
-	data := new(LogDataModel)
-	data.System = system
-	data.Date = FormatSystemDate(FMT_YYYY_MM_DD_HH_MM_SS_SSS)
-	data.Text = text
-	data.ServerIp = GetLocalIp()
-	data.ServerName = GetLocalHostName()
-	data.LogLevel = logLevel
+	// 其他字段检查补填
+	if ldm.System == "" {
+		ldm.System = g.system
+	}
+	ldm.Date = Now()
+	if ldm.ServerIp == "" {
+		ldm.ServerIp = GetPreferredLocalIPv4()
+	}
+	if ldm.ServerName == "" {
+		ldm.ServerName = GetLocalHostName()
+	}
+	if ldm.TraceId == "" {
+		ldm.TraceId = HashString(ULID())
+	}
 
-	g.logChan <- data.ToJson()
+	g.logChan <- ldm
 }

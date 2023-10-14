@@ -32,15 +32,17 @@ func Test_redis6(t *testing.T) {
 func Test_leveldb(t *testing.T) {
 
 	// 开启日志发送GLC
-	SetLogCenterClient(NewGLogCenterClient(&GlcOptions{
-		ApiUrl:   GetEnvStr("GLC_API_URL", "http://glc.nnn.com/glc/v1/log/add"),
+	SetGlcClient(NewGlcClient(&GlcOptions{
+		ApiUrl:   GetEnvStr("GLC_API_URL", "http://ip:port/glc/v1/log/add"),
 		System:   GetEnvStr("GLC_SYSTEM", "glang/cmn"),
 		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
-		Enable:   GetEnvBool("GLC_ENABLE", false),
-		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "trace"),
+		Enable:   GetEnvBool("GLC_ENABLE", true),
+		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "debug"),
 	}))
 
-	ldb := NewLevelDB("f:\\222\\ldbtest", nil)
+	Info("测试", "开始", &GlcData{TraceId: "xxxxx", System: "test"})
+
+	ldb := NewLevelDB("e:\\222\\ldbtest", nil)
 	ldb.Put(StringToBytes("key"), StringToBytes("value"))
 
 	by, err := ldb.Get(StringToBytes("key"))
