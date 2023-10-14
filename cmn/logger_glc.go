@@ -212,13 +212,13 @@ func (g *GlcClient) print(params []any, ldm *GlcData) {
 	}
 	ldm.Date = Now()
 	if ldm.ServerIp == "" {
-		ldm.ServerIp = GetPreferredLocalIPv4()
+		ldm.ServerIp = g.opt.ServerIp
 	}
 	if ldm.ServerName == "" {
-		ldm.ServerName = GetLocalHostName()
+		ldm.ServerName = g.opt.ServerName
 	}
 	if ldm.ClientIp == "" {
-		ldm.ClientIp = GetPreferredLocalIPv4()
+		ldm.ClientIp = g.opt.ClientIp
 	}
 	if ldm.TraceId == "" {
 		ldm.TraceId = HashString(ULID())
