@@ -154,42 +154,51 @@ func logParams(v ...any) ([]any, *GlcData) {
 
 func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 
-	// 控制台日志
-	log.Println(append([]any{level}, params...)...)
+	log.Println(append([]any{level}, params...)...) // 控制台日志
 	if g == nil || g.stop || !g.opt.Enable {
 		return
 	}
 
-	if ldm == nil {
-		ldm = &GlcData{}
+	glcData := &GlcData{
+		Date:       Now(),
+		System:     g.opt.System,
+		ServerName: g.opt.ServerName,
+		ServerIp:   g.opt.ServerIp,
+		ClientIp:   g.opt.ClientIp,
+		LogLevel:   level,
 	}
 
-	if len(params) > 0 {
-		ldm.Text = fmt.Sprint(params...) // 日志参数优先
+	if len(params) <= 0 {
+		if ldm != nil {
+			glcData.Text = ldm.Text
+		}
+	} else {
+		glcData.Text = fmt.Sprint(params...) // 日志参数优先
 	}
 
 	// 其他字段检查补填
-	if ldm.System == "" {
-		ldm.System = g.opt.System
-	}
-	ldm.Date = Now()
-	if ldm.ServerIp == "" {
-		ldm.ServerIp = g.opt.ServerIp
-	}
-	if ldm.ServerName == "" {
-		ldm.ServerName = g.opt.ServerName
-	}
-	if ldm.ClientIp == "" {
-		ldm.ClientIp = g.opt.ClientIp
-	}
-	if ldm.TraceId == "" {
-		ldm.TraceId = HashString(ULID())
+	if ldm != nil {
+		if ldm.System != "" {
+			glcData.System = ldm.System
+		}
+		if ldm.ServerName != "" {
+			glcData.ServerName = ldm.ServerName
+		}
+		if ldm.ServerIp != "" {
+			glcData.ServerIp = ldm.ServerIp
+		}
+		if ldm.ClientIp != "" {
+			glcData.ClientIp = ldm.ClientIp
+		}
+		if ldm.TraceId != "" {
+			glcData.TraceId = ldm.TraceId
+		}
+	} else {
+		glcData.TraceId = HashString(ULID())
 	}
 
-	if g != nil && !g.stop && g.opt.Enable {
-		g.busy = true
-		g.logChan <- ldm
-	}
+	g.busy = true
+	g.logChan <- glcData
 }
 
 // 停止接收新的日志并等待日志全部输出完成
