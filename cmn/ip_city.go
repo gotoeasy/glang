@@ -17,7 +17,16 @@ type ipCityResult struct {
 
 var _ipCache *LruCache
 
-// 获取ip所属城市
+// 获取ip地址信息含ip
+func GetCityIp(ip string) string {
+	ct := GetCityByIp(ip)
+	if ct != "" {
+		return ct + " " + ip
+	}
+	return ip
+}
+
+// 获取ip地址信息不含ip
 func GetCityByIp(ip string) string {
 	if _ipCache == nil {
 		_ipCache = NewLruCache(128)
