@@ -19,6 +19,9 @@ var _ipCache *LruCache
 
 // 获取ip地址信息含ip
 func GetCityIp(ip string) string {
+	if ip == "" {
+		return ""
+	}
 	ct := GetCityByIp(ip)
 	if ct != "" {
 		return ct + " " + ip

@@ -53,6 +53,7 @@ type GlcOptions struct {
 	ServerName        string // 服务器名
 	ServerIp          string // 服务器IP
 	ClientIp          string // 客户端IP
+	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认false
 
 }
 
@@ -205,6 +206,10 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 	}
 	if glcData.TraceId == "" {
 		glcData.TraceId = HashString(ULID())
+	}
+	if g.opt.AddCityToIp {
+		glcData.ServerIp = GetCityIp(glcData.ServerIp)
+		glcData.ClientIp = GetCityIp(glcData.ClientIp)
 	}
 
 	g.busy = true
