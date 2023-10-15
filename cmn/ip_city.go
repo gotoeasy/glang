@@ -15,13 +15,23 @@ type ipCityResult struct {
 	Err         string `json:"err,omitempty"`
 }
 
+var _ipCache *LruCache
+
 // 获取ip所属城市
 func GetCityByIp(ip string) string {
+	if _ipCache == nil {
+		_ipCache = NewLruCache(128)
+	}
 	if ip == "" {
 		return ""
 	}
 	if ip == "[::1]" || ip == "127.0.0.1" || Startwiths(ip, "192") || Startwiths(ip, "172") || Startwiths(ip, "10.") {
 		return "内网"
+	}
+
+	addr, find := _ipCache.Get(ip)
+	if find {
+		return addr
 	}
 
 	// {"ip":"x.x.x.x","pro":"浙江省","proCode":"330000","city":"杭州市","cityCode":"330100","region":"","regionCode":"0","addr":"浙江省杭州市 电信","regionNames":"","err":""}
@@ -37,9 +47,14 @@ func GetCityByIp(ip string) string {
 		return ""
 	}
 
-	if d.Pro != "" && d.Pro == d.City {
+	if d.Addr != "" {
+		_ipCache.Add(ip, d.Addr)
+		return d.Addr
+	} else if d.Pro != "" && d.Pro == d.City {
+		_ipCache.Add(ip, d.Pro)
 		return d.Pro
+	} else {
+		_ipCache.Add(ip, Trim(d.Pro+d.City))
+		return Trim(d.Pro + d.City)
 	}
-
-	return Trim(d.Pro + d.City)
 }
