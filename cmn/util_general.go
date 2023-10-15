@@ -37,3 +37,11 @@ func NormalizeVer(ver string) string {
 	ary1[2] = Right(IntToString(1000+StringToInt(ary1[2], 0)), 3)
 	return Join(ary1, ".")
 }
+
+// 条件参数真时返回字符串1，否则返回字符串2
+func IifStr(condtion bool, s1 string, s2 string) string {
+	if condtion {
+		return s1
+	}
+	return s2
+}

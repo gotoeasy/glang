@@ -44,18 +44,25 @@ type GlcClient struct {
 
 // 日志中心选项
 type GlcOptions struct {
-	ApiUrl     string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
-	System     string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
-	ApiKey     string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
-	Enable     bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
-	LogLevel   string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
-	ServerName string // 服务器名
-	ServerIp   string // 服务器IP
-	ClientIp   string // 客户端IP
+	ApiUrl            string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
+	System            string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
+	ApiKey            string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
+	Enable            bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
+	DisableConsoleLog bool   // 是否禁止打印控制台日志，默认false
+	LogLevel          string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
+	ServerName        string // 服务器名
+	ServerIp          string // 服务器IP
+	ClientIp          string // 客户端IP
 
 }
 
 var _glc *GlcClient
+
+func init() {
+	if GetEnvBool("GLC_ENABLE", false) {
+		_glc = NewGlcClient(nil) // 使用环境变量配置初始化
+	}
+}
 
 // 创建日志中心客户端对象
 func NewGlcClient(o *GlcOptions) *GlcClient {
@@ -97,8 +104,8 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 
 	go func() {
 		for {
-			ldm := <-glc.logChan
-			FasthttpPostJson(glc.opt.ApiUrl, ldm.ToJson(), glc.opt.ApiKey)
+			gd := <-glc.logChan
+			FasthttpPostJson(glc.opt.ApiUrl, gd.ToJson(), glc.opt.ApiKey)
 			if len(glc.logChan) <= 0 {
 				glc.busy = false
 			}
@@ -154,8 +161,10 @@ func logParams(v ...any) ([]any, *GlcData) {
 
 func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 
-	log.Println(append([]any{level}, params...)...) // 控制台日志
-	if g == nil || g.stop || !g.opt.Enable {
+	if g == nil || !g.opt.DisableConsoleLog {
+		log.Println(append([]any{level}, params...)...) // 控制台日志
+	}
+	if g == nil || g.stop || !g.opt.Enable || g.opt.ApiUrl == "" {
 		return
 	}
 
@@ -193,7 +202,8 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 		if ldm.TraceId != "" {
 			glcData.TraceId = ldm.TraceId
 		}
-	} else {
+	}
+	if glcData.TraceId == "" {
 		glcData.TraceId = HashString(ULID())
 	}
 

@@ -28,14 +28,12 @@ func GetCityByIp(ip string) string {
 	url := "https://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
 	bt, err := HttpGetJson(url)
 	if err != nil {
-		Error(err)
 		return ""
 	}
 
 	d := &ipCityResult{}
 	err = json.Unmarshal(GbkToUtf8(bt), d)
 	if err != nil {
-		Error(err)
 		return ""
 	}
 

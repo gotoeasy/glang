@@ -3,6 +3,7 @@ package cmn
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -45,4 +46,17 @@ func FasthttpPostJson(url string, jsondata string, headers ...string) ([]byte, e
 		return nil, errors.New(IntToString(res.StatusCode()))
 	}
 	return res.Body(), nil
+}
+
+// 取客户端IP
+func GetFasthttpClientIp(ctx *fasthttp.RequestCtx) string {
+	xForwardedFor := string(ctx.Request.Header.Peek("X-Forwarded-For"))
+	if xForwardedFor != "" {
+		ips := strings.Split(xForwardedFor, ",")
+		clientIP := strings.TrimSpace(ips[0])
+		if clientIP != "" {
+			return clientIP
+		}
+	}
+	return ctx.RemoteIP().String()
 }
