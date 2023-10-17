@@ -2,7 +2,6 @@ package cmn
 
 import (
 	"crypto/md5"
-	"encoding/base64"
 	"encoding/hex"
 	"hash/crc32"
 	"io"
@@ -37,21 +36,6 @@ func HashMod(str string, mod uint32) uint32 {
 // 随机 uint32
 func RadomUint32() uint32 {
 	return Hash(ULID())
-}
-
-// Base64编码（同Base64Encode）
-func Base64(bts []byte) string {
-	return base64.StdEncoding.EncodeToString(bts)
-}
-
-// Base64编码
-func Base64Encode(bts []byte) string {
-	return base64.StdEncoding.EncodeToString(bts)
-}
-
-// Base64解码
-func Base64Decode(str string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(str)
 }
 
 // MD5

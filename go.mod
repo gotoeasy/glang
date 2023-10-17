@@ -12,6 +12,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/snappy v0.0.4
 	github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76
+	github.com/jxskiss/base62 v1.1.0
 	github.com/libp2p/go-libp2p v0.31.0
 	github.com/minio/minio-go/v7 v7.0.63
 	github.com/mitchellh/mapstructure v1.5.0
@@ -20,10 +21,10 @@ require (
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/shirou/gopsutil/v3 v3.23.9
 	github.com/shopspring/decimal v1.3.1
-	github.com/syndtr/goleveldb v1.0.0
+	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	github.com/valyala/fasthttp v1.50.0
 	github.com/wangbin/jiebago v0.3.2
-	golang.org/x/crypto v0.13.0
+	golang.org/x/crypto v0.14.0
 	golang.org/x/image v0.12.0
 	golang.org/x/net v0.15.0
 	golang.org/x/text v0.13.0
@@ -122,7 +123,7 @@ require (
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/tools v0.12.1-0.20230815132531-74c255bcf846 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
