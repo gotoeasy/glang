@@ -25,7 +25,7 @@ type DbOption struct {
 }
 
 // 初始化数据库配置
-func init() {
+func initSqlDb() {
 	// TODO 读取配置
 	dataSource := GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
 	db, err := sql.Open("mysql", dataSource)
@@ -42,6 +42,11 @@ func init() {
 
 // 新建数据库控制器
 func NewDbHandle(opt ...*DbOption) *DbHandle {
+
+	if _sqlDb == nil {
+		initSqlDb()
+	}
+
 	db := &DbHandle{
 		db:  _sqlDb,
 		opt: &DbOption{},

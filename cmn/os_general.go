@@ -20,14 +20,14 @@ func GetLocalIp() string {
 	if err == nil {
 		for _, address := range addrs {
 			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
-				localIpAddres = Split(ipnet.IP.String(), ":")[0]
+				localIpAddres = ipnet.IP.String()
 				if Startwiths(localIpAddres, "172.") || Startwiths(localIpAddres, "192.") || Startwiths(localIpAddres, "10.") {
 					break // 内部IP优先
 				}
 			}
 		}
 	}
-	return Split(localIpAddres, ":")[0]
+	return localIpAddres
 }
 
 // 取本机IP地址（IPv4），eth0优先
@@ -55,7 +55,7 @@ func GetPreferredLocalIPv4() string {
 				if ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
 					rs := ipnet.IP.String()
 					if Startwiths(rs, "172.") || Startwiths(rs, "192.") || Startwiths(rs, "10.") {
-						localInternalIpAddres = Split(rs, ":")[0]
+						localInternalIpAddres = rs
 						return localInternalIpAddres // 理想情况下是从这里取到
 					}
 				}
