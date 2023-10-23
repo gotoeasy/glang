@@ -7,7 +7,7 @@ import (
 	"github.com/go-ole/go-ole/oleutil"
 )
 
-// 生成指定文件的快捷文件
+// 【win】生成指定文件的快捷文件
 func CreateShortcutFile(targetFile string, shortcutLnkFile string) error {
 	ole.CoInitialize(0)
 	defer ole.CoUninitialize()

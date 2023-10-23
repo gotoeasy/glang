@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// 在 C:/Windows/System32/drivers/etc/hosts 中添加指定映射
+// 【win】在 C:/Windows/System32/drivers/etc/hosts 中添加指定映射
 func HostsAddDomain(ip string, domain string) error {
 	hostsfile := "C:\\Windows\\System32\\drivers\\etc\\hosts"
 	txt, _ := ReadFileString(hostsfile)
