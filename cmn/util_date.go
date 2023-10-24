@@ -56,6 +56,15 @@ func GetYyyymmdd(addDays int) string {
 	return time.Now().AddDate(0, 0, addDays).Format("20060102")
 }
 
+// 返回年月周yyyymm+week
+func GetYearMonthWeek() string {
+	currentTime := time.Now()
+	year := currentTime.Format("2006")
+	month := currentTime.Format("01")
+	_, week := currentTime.ISOWeek()        // 系统日期属于当月第几周
+	return year + month + IntToString(week) // 拼接(年、月、周)返回
+}
+
 // 格式化日期
 func FormatDate(date time.Time, fmt DateFormat) string {
 	layout := string(fmt)
