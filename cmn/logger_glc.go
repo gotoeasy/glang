@@ -45,15 +45,16 @@ type GlcClient struct {
 // 日志中心选项
 type GlcOptions struct {
 	ApiUrl            string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
-	System            string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_API_URL，未设定时default
-	ApiKey            string // 日志中心的ApiKey，默认取环境变量GLC_API_URL
-	Enable            bool   // 是否开启发送到日志中心，默认取环境变量GLC_API_URL，未设定时false
-	DisableConsoleLog bool   // 是否禁止打印控制台日志，默认false
-	LogLevel          string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_API_URL，未设定时DEBUG
+	System            string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_SYSTEM，未设定时default
+	ApiHeader         string // 日志中心的API秘钥的header键名，默认取环境变量GLC_API_HEADER
+	ApiKey            string // 日志中心的ApiKey，默认取环境变量GLC_API_KEY
+	Enable            bool   // 是否开启发送到日志中心，默认取环境变量GLC_ENABLE，未设定时false
+	DisableConsoleLog bool   // 是否禁止打印控制台日志，默认取环境变量GLC_DISABLE_CONSOLE_LOG，默认false
+	LogLevel          string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_LOG_LEVEL，未设定时DEBUG
 	ServerName        string // 服务器名
 	ServerIp          string // 服务器IP
 	ClientIp          string // 客户端IP
-	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认false
+	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认取环境变量GLC_ADD_CITY_TO_IP，默认false
 
 }
 
@@ -70,11 +71,14 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 	if o == nil {
 		// 按环境编配配置初始化glc对象
 		o = &GlcOptions{
-			ApiUrl:   GetEnvStr("GLC_API_URL", ""),
-			System:   GetEnvStr("GLC_SYSTEM", "default"),
-			ApiKey:   GetEnvStr("GLC_API_KEY", ""),
-			Enable:   GetEnvBool("GLC_ENABLE", false),
-			LogLevel: GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
+			ApiUrl:            GetEnvStr("GLC_API_URL", ""),
+			System:            GetEnvStr("GLC_SYSTEM", "default"),
+			ApiHeader:         GetEnvStr("GLC_API_HEADER", ""),
+			ApiKey:            GetEnvStr("GLC_API_KEY", ""),
+			Enable:            GetEnvBool("GLC_ENABLE", false),
+			DisableConsoleLog: GetEnvBool("GLC_DISABLE_CONSOLE_LOG", false),
+			LogLevel:          GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
+			AddCityToIp:       GetEnvBool("GLC_ADD_CITY_TO_IP", false),
 		}
 	} else {
 		if o.ApiUrl == "" {
