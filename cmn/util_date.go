@@ -90,7 +90,7 @@ func ParseDate(date string, fmt DateFormat) (time.Time, error) {
 	return time.Parse(string(fmt), date)
 }
 
-// 系统时间 yyyy/MM/dd HH:mm:ss.SSS
+// 系统时间 yyyy-MM-dd HH:mm:ss.SSS
 func Now() string {
 	return time.Now().Format("2006-01-02 15:04:05.000")
 }
