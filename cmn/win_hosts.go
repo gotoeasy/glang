@@ -30,6 +30,7 @@ func GetUserHomeDir() string {
 	return dir
 }
 
+// 【win】Window系统Startup目录
 func GetUserStartupDir() string {
 	return filepath.Join(GetUserHomeDir(), `AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`)
 }
