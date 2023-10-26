@@ -45,3 +45,10 @@ func IifStr(condtion bool, s1 string, s2 string) string {
 	}
 	return s2
 }
+
+// 捕获panic时打印异常日志避免崩溃，逻辑适用情况下，可简化用 defer Recover() 替代匿名函数的啰嗦写法
+func Recover() {
+	if e := recover(); e != nil {
+		Error("panic:", e)
+	}
+}

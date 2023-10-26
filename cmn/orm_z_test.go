@@ -51,11 +51,7 @@ func Test_orm_select(t *testing.T) {
 }
 
 func Test_orm(t *testing.T) {
-	defer func() {
-		if e := recover(); e != nil {
-			Error("出错啦", e)
-		}
-	}()
+	defer Recover()
 
 	id := ULID()
 	ent := &xx_test{
