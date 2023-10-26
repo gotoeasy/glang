@@ -54,7 +54,6 @@ type GlcOptions struct {
 	ServerIp          string // 服务器IP
 	ClientIp          string // 客户端IP
 	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认取环境变量GLC_ADD_CITY_TO_IP，默认false
-
 }
 
 var _glc *GlcClient
@@ -229,4 +228,18 @@ func (g *GlcClient) WaitFinish() {
 			time.Sleep(time.Millisecond * 10)
 		}
 	}
+}
+
+func GetGlcLatestVersion(url string) string {
+	// 返回样例 {"version":"v0.12.0"}
+	bts, err := HttpGetJson(url, "Glc:"+HashString(GetLocalHostName()+"一个端点有区别的固定值"))
+	if err == nil {
+		var data struct {
+			Version string `json:"version,omitempty"`
+		}
+		if err := json.Unmarshal(bts, &data); err == nil {
+			return data.Version
+		}
+	}
+	return ""
 }
