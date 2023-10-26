@@ -15,7 +15,6 @@ var _sqlDb *sql.DB
 type DbHandle struct {
 	db  *sql.DB
 	tx  *sql.Tx
-	err error
 	opt *DbOption
 }
 
@@ -30,7 +29,8 @@ func initSqlDb() {
 	dataSource := GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		panic(errors.Join(mysql.ErrInvalidConn, err)) // 特意触发装载驱动
+		Error(errors.Join(mysql.ErrInvalidConn, err))
+		return
 	}
 
 	db.SetMaxIdleConns(5)                // 最大空闲连接数
@@ -64,7 +64,7 @@ func (d *DbHandle) IsAutoCommit() bool {
 	return d.opt.AutoCommit
 }
 
-// 开启事务，出错时panic
+// 开启事务，出错时会panic，应先执行 defer EndTransaction()
 func (d *DbHandle) BeginTransaction() {
 	if d == nil {
 		return // 忽视
@@ -97,7 +97,6 @@ func (d *DbHandle) Commit() error {
 	err := d.tx.Commit()
 	if err == nil {
 		d.tx = nil
-		d.err = nil
 		Debug("提交事务")
 	} else {
 		Error("提交事务失败", err)
@@ -118,7 +117,6 @@ func (d *DbHandle) Rollback() error {
 	err := d.tx.Rollback()
 	if err == nil {
 		d.tx = nil
-		d.err = nil
 		Debug("回滚事务")
 	} else {
 		Error("回滚事务失败", err)
@@ -126,17 +124,20 @@ func (d *DbHandle) Rollback() error {
 	return err
 }
 
-// 结束事务（未曾出错时提交，否则回滚），失败时返回错误
+// 结束事务（通过recover()捕获错误，没有错误时提交，否则回滚），事务操作失败时返回错误
 func (d *DbHandle) EndTransaction() error {
-	if d == nil {
-		return nil // 忽视
-	}
-
-	if d.err == nil {
-		return d.Commit()
-	} else {
+	if e := recover(); e != nil {
+		Error("panic:", e)
+		if d == nil {
+			return nil
+		}
 		return d.Rollback()
 	}
+
+	if d == nil {
+		return nil
+	}
+	return d.Commit()
 }
 
 // 执行SQL（开启事务时自动在事务内执行），出错时panic
@@ -169,16 +170,10 @@ func (d *DbHandle) Execute(sql string, params ...any) int64 {
 	if err == nil {
 		Info(sql, "\n  parameters:", params, "\n ", cnt, "rows affected")
 	} else {
-		d.err = err
-		Error(sql, " 执行SQL发生错误：", err, "\n  parameters: ", params)
-		panic(errors.Join(errors.New("执行SQL发生错误: "+sql), err))
+		Error("执行SQL发生错误：", err, "\n", sql, "\n  parameters: ", params)
+		panic(err)
 	}
 	return cnt
-}
-
-// 取错误信息
-func (d *DbHandle) Err() error {
-	return d.err
 }
 
 // 插入记录，出错时panic
@@ -204,7 +199,6 @@ func (d *DbHandle) Update(updater *SqlUpdater) int64 {
 func (d *DbHandle) FindMaps(entity any, sql string, params ...any) []map[string]any {
 	structType, err := ParseStructType(entity)
 	if err != nil {
-		d.err = err
 		panic(err)
 	}
 
@@ -215,26 +209,22 @@ func (d *DbHandle) FindMaps(entity any, sql string, params ...any) []map[string]
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	}
@@ -248,7 +238,6 @@ func (d *DbHandle) FindMaps(entity any, sql string, params ...any) []map[string]
 func (d *DbHandle) FindMap(entity any, sql string, params ...any) map[string]any {
 	structType, err := ParseStructType(entity)
 	if err != nil {
-		d.err = err
 		panic(err)
 	}
 
@@ -259,26 +248,22 @@ func (d *DbHandle) FindMap(entity any, sql string, params ...any) map[string]any
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	}
@@ -297,7 +282,6 @@ func (d *DbHandle) FindMap(entity any, sql string, params ...any) map[string]any
 func (d *DbHandle) FindList(structSlicePtr any, sql string, params ...any) {
 	structType, err := GetTypeOfStructSlicePointer(structSlicePtr)
 	if err != nil {
-		d.err = err
 		panic(err)
 	}
 
@@ -308,26 +292,22 @@ func (d *DbHandle) FindList(structSlicePtr any, sql string, params ...any) {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	}
@@ -350,7 +330,6 @@ func (d *DbHandle) FindList(structSlicePtr any, sql string, params ...any) {
 func (d *DbHandle) FindOne(structPtr any, sql string, params ...any) bool {
 	structType, err := GetTypeOfStructPointer(structPtr)
 	if err != nil {
-		d.err = err
 		panic(err)
 	}
 
@@ -361,26 +340,22 @@ func (d *DbHandle) FindOne(structPtr any, sql string, params ...any) bool {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
 			Error(sql, "查询出错：", err, "\n  parameters:", params)
-			d.err = err
 			panic(err)
 		}
 	}
@@ -424,7 +399,6 @@ func (d *DbHandle) FindValue(sql string, params ...any) *DbValue {
 	if d.tx != nil {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
-			d.err = err
 			panic(err)
 		}
 
@@ -438,7 +412,6 @@ func (d *DbHandle) FindValue(sql string, params ...any) *DbValue {
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
-			d.err = err
 			panic(err)
 		}
 		v := d.getDbValue(rows)
@@ -459,14 +432,13 @@ func (d *DbHandle) getDbValue(rows *sql.Rows) *DbValue {
 		panic(err)
 	}
 	if len(columns) > 1 {
-		panic("只能查询1列，实际查询了" + IntToString(len(columns)) + "列")
+		panic(errors.New("只能查询1列，实际查询了" + IntToString(len(columns)) + "列"))
 	}
 
 	if rows.Next() {
 		var v any
 		err := rows.Scan(&v)
 		if err != nil {
-			d.err = err
 			panic(err)
 		}
 		return &DbValue{value: v}

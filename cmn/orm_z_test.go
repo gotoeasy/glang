@@ -63,8 +63,8 @@ func Test_orm(t *testing.T) {
 	}
 
 	dbHandle := NewDbHandle()
-	dbHandle.BeginTransaction()
 	defer dbHandle.EndTransaction()
+	dbHandle.BeginTransaction()
 
 	dbHandle.Insert(ent)
 
@@ -75,16 +75,16 @@ func Test_orm(t *testing.T) {
 
 func Test_ormDel(t *testing.T) {
 	dbHandle := NewDbHandle()
-	dbHandle.BeginTransaction()
 	defer dbHandle.EndTransaction()
+	dbHandle.BeginTransaction()
 	sqld := NewSqlDeleter().Delete("xx_test").Where("room_id", "1").Ge("reserve_title", 2).In("reserve_user", "a", "b", "c").Like("note", "sss")
 	dbHandle.Delete(sqld)
 }
 
 func Test_ormUpd(t *testing.T) {
 	dbHandle := NewDbHandle()
-	dbHandle.BeginTransaction()
 	defer dbHandle.EndTransaction()
+	dbHandle.BeginTransaction()
 	sqlu := NewSqlUpdater().Update("xx_test").Set("room_id", "111").
 		Set("reserve_title", "ssssss").
 		Lt("room_id", "1").Ge("reserve_title", "2").In("reserve_user", "a", "b", "c")
