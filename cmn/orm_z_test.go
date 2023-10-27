@@ -75,7 +75,7 @@ func Test_orm(t *testing.T) {
 
 func Test_ormDel(t *testing.T) {
 	dbHandle := NewDbHandle()
-	dbHandle.BeginTransaction()
+	// dbHandle.BeginTransaction()
 	defer dbHandle.EndTransaction()
 	sqld := NewSqlDeleter().Delete("xx_test").Where("room_id", "1").Ge("reserve_title", 2).In("reserve_user", "a", "b", "c").Like("note", "sss")
 	dbHandle.Delete(sqld)
