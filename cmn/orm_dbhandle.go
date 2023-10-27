@@ -15,6 +15,7 @@ var _sqlDb *sql.DB
 type DbHandle struct {
 	db  *sql.DB
 	tx  *sql.Tx
+	err error
 	opt *DbOption
 }
 
@@ -24,39 +25,42 @@ type DbOption struct {
 }
 
 // 初始化数据库配置
-func initSqlDb() {
+func initSqlDb() (*sql.DB, error) {
+	if _sqlDb != nil {
+		return _sqlDb, nil
+	}
+
 	// TODO 读取配置
 	dataSource := GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		Error(errors.Join(mysql.ErrInvalidConn, err))
-		return
+		return nil, errors.Join(mysql.ErrInvalidConn, err)
 	}
 
-	db.SetMaxIdleConns(5)                // 最大空闲连接数
-	db.SetMaxOpenConns(50)               // 最大连接数
-	db.SetConnMaxLifetime(time.Hour * 3) // 一个连接的最长生命周期(mysql默认8小时)
-
 	_sqlDb = db
+
+	_sqlDb.SetMaxIdleConns(5)                // 最大空闲连接数
+	_sqlDb.SetMaxOpenConns(50)               // 最大连接数
+	_sqlDb.SetConnMaxLifetime(time.Hour * 3) // 一个连接的最长生命周期(mysql默认8小时)
+
+	return _sqlDb, nil
 }
 
 // 新建数据库控制器
 func NewDbHandle(opt ...*DbOption) *DbHandle {
 
-	if _sqlDb == nil {
-		initSqlDb()
-	}
-
-	db := &DbHandle{
-		db:  _sqlDb,
+	db, err := initSqlDb()
+	dbhandle := &DbHandle{
+		db:  db, // 可能是nil
+		err: err,
 		opt: &DbOption{},
 	}
 
 	if len(opt) > 0 {
-		db.opt = opt[0]
+		dbhandle.opt = opt[0]
 	}
 
-	return db
+	return dbhandle
 }
 
 // 是否自动提交
@@ -64,20 +68,26 @@ func (d *DbHandle) IsAutoCommit() bool {
 	return d.opt.AutoCommit
 }
 
-// 开启事务，出错时会panic，应先执行 defer EndTransaction()
+// 开启事务，逐一要配对调用 defer EndTransaction()
 func (d *DbHandle) BeginTransaction() {
 	if d == nil {
 		return // 忽视
 	}
 
+	if d.db == nil || d.err != nil {
+		Error("开启事务失败（数据库连接无效或已发生错误）", d.err)
+		return
+	}
+
 	if d.tx != nil {
-		Warn("重复开启事务（忽略操作）")
+		Error("重复开启事务（忽略操作）")
 		return // 重复Begin不出错，简单忽视
 	}
 
 	tx, err := d.db.Begin()
 	if err != nil {
-		panic(errors.Join(errors.New("开启事务失败"), err))
+		d.err = err
+		Error("开启事务失败：", err)
 	} else {
 		Debug("开启事务")
 		d.tx = tx
@@ -90,8 +100,13 @@ func (d *DbHandle) Commit() error {
 		return nil // 忽视
 	}
 
+	if d.db == nil || d.err != nil {
+		Error("提交事务失败（数据库连接无效或已发生错误）", d.err)
+		return nil
+	}
+
 	if d.tx == nil {
-		Warn("无效的提交（事务还没有开始，忽略操作）")
+		Error("无效的提交（事务还没有开始，忽略操作）")
 		return nil
 	}
 	err := d.tx.Commit()
@@ -110,8 +125,13 @@ func (d *DbHandle) Rollback() error {
 		return nil // 忽视
 	}
 
+	if d.db == nil || d.err != nil {
+		Error("回滚事务失败（数据库连接无效或已发生错误）", d.err)
+		return nil
+	}
+
 	if d.tx == nil {
-		Warn("无效的回滚（事务还没有开始，忽略操作）")
+		Error("无效的回滚（事务还没有开始，忽略操作）")
 		return nil
 	}
 	err := d.tx.Rollback()
@@ -131,17 +151,22 @@ func (d *DbHandle) EndTransaction() error {
 		if d == nil {
 			return nil
 		}
-		return d.Rollback()
+		return d.Rollback() // 异常时回滚
 	}
 
-	if d == nil {
-		return nil
+	if d == nil || d.db == nil || d.err != nil {
+		return nil // NewDbHandle 或 BeginTransaction 出现问题，忽略
 	}
+
 	return d.Commit()
 }
 
 // 执行SQL（开启事务时自动在事务内执行），出错时panic
 func (d *DbHandle) Execute(sql string, params ...any) int64 {
+	if d.err != nil {
+		panic(d.err)
+	}
+
 	if !d.opt.AutoCommit && d.tx == nil {
 		d.BeginTransaction()
 	}
