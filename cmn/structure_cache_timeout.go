@@ -6,22 +6,22 @@ import (
 )
 
 // 缓存项结构
-type cacheItem struct {
-	value      any
+type CacheItem struct {
+	Value      any
 	expiration time.Time
 }
 
 // 缓存结构
 type Cache struct {
 	mu       sync.RWMutex
-	items    map[string]cacheItem
+	items    map[string]CacheItem
 	duration time.Duration
 }
 
 // 新建内存缓存(有存活期，会定期清理失效缓存)
 func NewCache(duration time.Duration) *Cache {
 	cache := &Cache{
-		items:    make(map[string]cacheItem),
+		items:    make(map[string]CacheItem),
 		duration: duration,
 	}
 	go cache.cleanupExpired()
@@ -33,7 +33,7 @@ func (c *Cache) Set(key string, value any) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	expiration := time.Now().Add(c.duration)
-	c.items[key] = cacheItem{value: value, expiration: expiration}
+	c.items[key] = CacheItem{Value: value, expiration: expiration}
 }
 
 // 获取缓存项
@@ -48,7 +48,7 @@ func (c *Cache) Get(key string) (any, bool) {
 		c.Delete(key)
 		return nil, false
 	}
-	return item.value, true
+	return item.Value, true
 }
 
 // 删除缓存项
