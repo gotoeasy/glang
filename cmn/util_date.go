@@ -94,3 +94,8 @@ func ParseDate(date string, fmt DateFormat) (time.Time, error) {
 func Now() string {
 	return time.Now().Format("2006-01-02 15:04:05.000")
 }
+
+// 系统时间按指定的golang时间格式返回 （2006-01-02 15:04:05.000 代表 yyyy-MM-dd HH:mm:ss.SSS）
+func NowTime(fmt string) string {
+	return time.Now().Format("2006-01-02 15:04:05.000")
+}
