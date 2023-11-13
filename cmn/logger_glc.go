@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"runtime"
 	"time"
 )
 
@@ -54,6 +55,7 @@ type GlcOptions struct {
 	ServerIp          string // 服务器IP
 	ClientIp          string // 客户端IP
 	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认取环境变量GLC_ADD_CITY_TO_IP，默认false
+	PrintSrcLine      bool   // 是否添加打印调用的文件行号
 }
 
 var _glc *GlcClient
@@ -76,6 +78,7 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 			DisableConsoleLog: GetEnvBool("GLC_DISABLE_CONSOLE_LOG", false),
 			LogLevel:          GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
 			AddCityToIp:       GetEnvBool("GLC_ADD_CITY_TO_IP", false),
+			PrintSrcLine:      GetEnvBool("GLC_PRINT_SRC_LINE", false),
 		}
 	} else {
 		if o.ApiUrl == "" {
@@ -124,24 +127,52 @@ func SetGlcClient(glcClient *GlcClient) {
 
 // 发送Debug级别日志到日志中心
 func (g *GlcClient) Debug(v ...any) {
+	if g.opt.PrintSrcLine {
+		_, file, line, ok := runtime.Caller(1)
+		if ok {
+			caller := file + ":" + IntToString(line)
+			v = append(v, "\n"+caller)
+		}
+	}
 	params, ldm := logParams(v...)
 	glcPrint(g, "DEBUG", params, ldm)
 }
 
 // 发送Info级别日志到日志中心
 func (g *GlcClient) Info(v ...any) {
+	if g.opt.PrintSrcLine {
+		_, file, line, ok := runtime.Caller(1)
+		if ok {
+			caller := file + ":" + IntToString(line)
+			v = append(v, "\n"+caller)
+		}
+	}
 	params, ldm := logParams(v...)
 	glcPrint(g, "INFO", params, ldm)
 }
 
 // 发送Warn级别日志到日志中心
 func (g *GlcClient) Warn(v ...any) {
+	if g.opt.PrintSrcLine {
+		_, file, line, ok := runtime.Caller(1)
+		if ok {
+			caller := file + ":" + IntToString(line)
+			v = append(v, "\n"+caller)
+		}
+	}
 	params, ldm := logParams(v...)
 	glcPrint(g, "WARN", params, ldm)
 }
 
 // 发送Error级别日志到日志中心
 func (g *GlcClient) Error(v ...any) {
+	if g.opt.PrintSrcLine {
+		_, file, line, ok := runtime.Caller(1)
+		if ok {
+			caller := file + ":" + IntToString(line)
+			v = append(v, "\n"+caller)
+		}
+	}
 	params, ldm := logParams(v...)
 	glcPrint(g, "ERROR", params, ldm)
 }
