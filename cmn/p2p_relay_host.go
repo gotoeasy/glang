@@ -50,7 +50,7 @@ func (p *P2pRelayHost) HostInfo() string {
 	if p.Host == nil {
 		return ""
 	}
-	hostId := p.Host.ID().Pretty()
+	hostId := p.Host.ID().String()
 	info := "节点ID=" + hostId
 	addrs := p.Host.Addrs()
 	for _, addr := range addrs {
