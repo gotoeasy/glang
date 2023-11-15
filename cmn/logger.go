@@ -10,8 +10,7 @@ func Debug(v ...any) {
 	if _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
-			caller := "caller:" + file + ":" + IntToString(line)
-			v = append(v, "\n"+caller)
+			v = append(v, "\n  caller:"+file+":"+IntToString(line))
 		}
 	}
 	_glc.Debug(v...)
@@ -25,8 +24,7 @@ func Info(v ...any) {
 	if _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
-			caller := "caller:" + file + ":" + IntToString(line)
-			v = append(v, "\n"+caller)
+			v = append(v, "\n  caller:"+file+":"+IntToString(line))
 		}
 	}
 	_glc.Info(v...)
@@ -40,8 +38,7 @@ func Warn(v ...any) {
 	if _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
-			caller := "caller:" + file + ":" + IntToString(line)
-			v = append(v, "\n"+caller)
+			v = append(v, "\n  caller:"+file+":"+IntToString(line))
 		}
 	}
 	_glc.Warn(v...)
@@ -55,8 +52,7 @@ func Error(v ...any) {
 	if _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
-			caller := "caller:" + file + ":" + IntToString(line)
-			v = append(v, "\n"+caller)
+			v = append(v, "\n  caller:"+file+":"+IntToString(line))
 		}
 	}
 	_glc.Error(v...)
