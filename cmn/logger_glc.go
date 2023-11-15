@@ -203,6 +203,9 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 		if ldm.TraceId != "" {
 			glcData.TraceId = ldm.TraceId
 		}
+		if ldm.User != "" {
+			glcData.User = ldm.User
+		}
 	}
 	if glcData.TraceId == "" {
 		glcData.TraceId = HashString(ULID())
