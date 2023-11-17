@@ -7,7 +7,7 @@ func Debug(v ...any) {
 	if _glc != nil && (_glc.logLevel > 1 || (_glc.opt.DisableConsoleLog && !_glc.opt.Enable)) {
 		return // 关闭日志输出时，跳过
 	}
-	if _glc.opt.PrintSrcLine {
+	if _glc != nil && _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
 			v = append(v, "\n  caller:"+file+":"+IntToString(line))
@@ -21,7 +21,7 @@ func Info(v ...any) {
 	if _glc != nil && (_glc.logLevel > 2 || (_glc.opt.DisableConsoleLog && !_glc.opt.Enable)) {
 		return // 关闭日志输出时，跳过
 	}
-	if _glc.opt.PrintSrcLine {
+	if _glc != nil && _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
 			v = append(v, "\n  caller:"+file+":"+IntToString(line))
@@ -35,7 +35,7 @@ func Warn(v ...any) {
 	if _glc != nil && (_glc.logLevel > 3 || (_glc.opt.DisableConsoleLog && !_glc.opt.Enable)) {
 		return // 关闭日志输出时，跳过
 	}
-	if _glc.opt.PrintSrcLine {
+	if _glc != nil && _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
 			v = append(v, "\n  caller:"+file+":"+IntToString(line))
@@ -49,7 +49,7 @@ func Error(v ...any) {
 	if _glc != nil && (_glc.logLevel > 4 || (_glc.opt.DisableConsoleLog && !_glc.opt.Enable)) {
 		return // 关闭日志输出时，跳过
 	}
-	if _glc.opt.PrintSrcLine {
+	if _glc != nil && _glc.opt.PrintSrcLine {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
 			v = append(v, "\n  caller:"+file+":"+IntToString(line))

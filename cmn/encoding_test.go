@@ -7,6 +7,19 @@ import (
 	"time"
 )
 
+func Test_gzipbytes(t *testing.T) {
+	s := "测试用字符串 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
+	gzipData, err := GzipBytes(StringToBytes(s))
+	if err != nil {
+		Error("GzipBytes ", err)
+	}
+	ungzipData, err := UnGzipBytes(gzipData)
+	if err != nil {
+		Error("UnGzipBytes ", err)
+	}
+	Info(BytesToString(ungzipData))
+}
+
 func Test_base62(t *testing.T) {
 	Info(Base62(StringToBytes("ss1111111111111111111111aa")))
 	bts, err := Base62Decode(Base62Encode(StringToBytes("ss1111111111111111111111aa")))
