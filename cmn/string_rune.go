@@ -59,14 +59,20 @@ func IsBlank(str string) bool {
 }
 
 // 判断是否指定前缀
-func Startwiths(str string, startstr string) bool {
+func Startwiths(str string, startstr string, ignoreCase ...bool) bool {
 	lstr := Left(str, Len(startstr))
+	if len(ignoreCase) > 0 && ignoreCase[0] {
+		return EqualsIngoreCase(lstr, startstr)
+	}
 	return lstr == startstr
 }
 
 // 判断是否指定后缀
-func Endwiths(str string, endstr string) bool {
+func Endwiths(str string, endstr string, ignoreCase ...bool) bool {
 	rstr := Right(str, Len(endstr))
+	if len(ignoreCase) > 0 && ignoreCase[0] {
+		return EqualsIngoreCase(rstr, endstr)
+	}
 	return rstr == endstr
 }
 
