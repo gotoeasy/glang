@@ -8,28 +8,40 @@ import (
 )
 
 // string 转 int
-func StringToInt(s string, defaultVal int) int {
+func StringToInt(s string, defaultVal ...int) int {
+	var defaultValue int
+	if len(defaultVal) > 0 {
+		defaultValue = defaultVal[0]
+	}
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		return defaultVal
+		return defaultValue
 	}
 	return v
 }
 
 // string 转 int64
-func StringToInt64(s string, defaultVal int64) int64 {
+func StringToInt64(s string, defaultVal ...int64) int64 {
+	var defaultValue int64
+	if len(defaultVal) > 0 {
+		defaultValue = defaultVal[0]
+	}
 	v, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-		return defaultVal
+		return defaultValue
 	}
 	return v
 }
 
 // string 转 float64
-func String2Float64(s string, defaultVal float64) float64 {
+func String2Float64(s string, defaultVal ...float64) float64 {
+	var defaultValue float64
+	if len(defaultVal) > 0 {
+		defaultValue = defaultVal[0]
+	}
 	v, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return defaultVal
+		return defaultValue
 	}
 	return v
 }
@@ -55,10 +67,14 @@ func IntToString(i int) string {
 }
 
 // 字符串(10进制无符号整数形式)转uint32，超过uint32最大值会丢失精度，转换失败时返回默认值
-func StringToUint32(s string, defaultVal uint32) uint32 {
+func StringToUint32(s string, defaultVal ...uint32) uint32 {
+	var defaultValue uint32
+	if len(defaultVal) > 0 {
+		defaultValue = defaultVal[0]
+	}
 	v, err := strconv.ParseUint(s, 10, 32)
 	if err != nil {
-		return defaultVal
+		return defaultValue
 	}
 	return uint32(v & 0xFFFFFFFF)
 }
