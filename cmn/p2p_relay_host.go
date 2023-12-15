@@ -106,16 +106,18 @@ func (p *P2pRelayHost) Request(targetHostAddr string, uri string, dataBytes []by
 	if err != nil {
 		return nil, nil, err
 	}
-	defer stream.Close()
+	// defer stream.Close()
 
 	// 发送请求数据
 	err = WriteBytesToStream(stream, dataBytes)
 	if err != nil {
+		stream.Close()
 		return nil, nil, err
 	}
 	// 接收请求数据
 	bts, err := ReadBytesFromStream(stream)
 	if err != nil {
+		stream.Close()
 		return nil, nil, err
 	}
 	return bts, stream, nil
