@@ -135,9 +135,11 @@ func (p *P2pRelayHost) Request(c *fasthttp.RequestCtx, targetHostAddr string, ur
 	}
 
 	if fdm.Success && fdm.Data != nil {
-		c.SetContentType(fdm.ContentType)
-		c.SetBody(fdm.Data)
-		c.SetStatusCode(200)
+		if c != nil {
+			c.SetContentType(fdm.ContentType)
+			c.SetBody(fdm.Data)
+			c.SetStatusCode(200)
+		}
 		return int64(len(fdm.Data)), nil
 	}
 
@@ -150,13 +152,15 @@ func (p *P2pRelayHost) Request(c *fasthttp.RequestCtx, targetHostAddr string, ur
 	fileLength := int64(BytesToUint32(prefix))
 
 	// 读内容
-	writer := c.Response.BodyWriter()
-	c.SetContentType(fdm.ContentType)
-	_, err = io.CopyN(writer, stream, fileLength)
-	if err != nil {
-		return 0, err
+	if c != nil {
+		writer := c.Response.BodyWriter()
+		c.SetContentType(fdm.ContentType)
+		_, err = io.CopyN(writer, stream, fileLength)
+		if err != nil {
+			return 0, err
+		}
+		c.SetStatusCode(200)
 	}
-	c.SetStatusCode(200)
 
 	return fileLength, nil
 }
