@@ -96,7 +96,39 @@ func (p *P2pRelayHost) SetStreamHandler(uri string, handler network.StreamHandle
 	p.Host.SetStreamHandler(protocol.ID(uri), handler)
 }
 
-// 向目标节点发起请求并返回响应结果，地址通常为 /ip4/{ip}/tcp/{port}/p2p/{peerid} 或 /p2p/{relayPeerid}/p2p-circuit/p2p/{peerid} 或 /p2p/{peerid}
+// 【注册】向目标节点发起请求并返回响应结果，地址通常为 /ip4/{ip}/tcp/{port}/p2p/{peerid} 或 /p2p/{relayPeerid}/p2p-circuit/p2p/{peerid} 或 /p2p/{peerid}
+func (p *P2pRelayHost) Regist(targetHostAddr string, uri string, dataBytes []byte) ([]byte, error) {
+	// 连接到目标节点
+	targetAddr, err := multiaddr.NewMultiaddr(targetHostAddr)
+	if err != nil {
+		return nil, err
+	}
+	targetAddrInfo, err := peer.AddrInfoFromP2pAddr(targetAddr)
+	if err != nil {
+		return nil, err
+	}
+	if err := p.Host.Connect(context.Background(), *targetAddrInfo); err != nil {
+		return nil, err
+	}
+
+	// 新建一个临时的会话流
+	stream, err := p.Host.NewStream(network.WithUseTransient(context.Background(), "临时会话"), targetAddrInfo.ID, protocol.ID(uri))
+	if err != nil {
+		return nil, err
+	}
+	defer stream.Close()
+
+	// 发送请求数据
+	err = WriteBytesToStream(stream, dataBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	// 接收请求数据
+	return ReadBytesFromStream(stream)
+}
+
+// 【请求】向目标节点发起请求并返回响应结果，地址通常为 /ip4/{ip}/tcp/{port}/p2p/{peerid} 或 /p2p/{relayPeerid}/p2p-circuit/p2p/{peerid} 或 /p2p/{peerid}
 func (p *P2pRelayHost) Request(c *fasthttp.RequestCtx, targetHostAddr string, uri string, dataBytes []byte) (int64, error) {
 	// 连接到目标节点
 	targetAddr, err := multiaddr.NewMultiaddr(targetHostAddr)
