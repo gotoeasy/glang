@@ -37,7 +37,7 @@ func GetCityByIp(ip string) string {
 	if ip == "" {
 		return ""
 	}
-	if ip == "[::1]" || ip == "127.0.0.1" || Startwiths(ip, "192") || Startwiths(ip, "172") || Startwiths(ip, "10.") {
+	if ip == "[::1]" || Startwiths(ip, "127") || Startwiths(ip, "192") || Startwiths(ip, "172") || Startwiths(ip, "10.") {
 		return "内网"
 	}
 
