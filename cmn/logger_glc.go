@@ -41,17 +41,17 @@ type GlcClient struct {
 
 // 日志中心选项
 type GlcOptions struct {
-	ApiUrl            string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
-	System            string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_SYSTEM，未设定时default
-	ApiKey            string // 日志中心的ApiKey，默认取环境变量GLC_API_KEY，未设定时X-GLC-AUTH:glogcenter
-	Enable            bool   // 是否开启发送到日志中心，默认取环境变量GLC_ENABLE，未设定时false
-	DisableConsoleLog bool   // 是否禁止打印控制台日志，默认取环境变量GLC_DISABLE_CONSOLE_LOG，默认false
-	LogLevel          string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_LOG_LEVEL，未设定时DEBUG
-	ServerName        string // 服务器名
-	ServerIp          string // 服务器IP
-	ClientIp          string // 客户端IP
-	AddCityToIp       bool   // 是否添加城市信息到IP前面，默认取环境变量GLC_ADD_CITY_TO_IP，默认false
-	PrintSrcLine      bool   // 是否添加打印调用的文件行号
+	ApiUrl           string // 日志中心的添加日志接口地址，默认取环境变量GLC_API_URL
+	System           string // 系统名（对应日志中心检索页面的分类栏），默认取环境变量GLC_SYSTEM，未设定时default
+	ApiKey           string // 日志中心的ApiKey，默认取环境变量GLC_API_KEY，未设定时X-GLC-AUTH:glogcenter
+	Enable           bool   // 是否开启发送到日志中心，默认取环境变量GLC_ENABLE，未设定时false
+	EnableConsoleLog bool   // 是否禁止打印控制台日志，默认取环境变量GLC_ENABLE_CONSOLE_LOG，默认true
+	LogLevel         string // 能输出的日志级别（DEBUG/INFO/WARN/ERROR），默认取环境变量GLC_LOG_LEVEL，未设定时DEBUG
+	ServerName       string // 服务器名
+	ServerIp         string // 服务器IP
+	ClientIp         string // 客户端IP
+	TraceId          string // 最终码
+	PrintSrcLine     bool   // 是否添加打印调用的文件行号
 }
 
 var _glc *GlcClient
@@ -67,14 +67,14 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 	if o == nil {
 		// 按环境编配配置初始化glc对象
 		o = &GlcOptions{
-			ApiUrl:            GetEnvStr("GLC_API_URL", ""),
-			System:            GetEnvStr("GLC_SYSTEM", "default"),
-			ApiKey:            GetEnvStr("GLC_API_KEY", "X-GLC-AUTH:glogcenter"),
-			Enable:            GetEnvBool("GLC_ENABLE", false),
-			DisableConsoleLog: GetEnvBool("GLC_DISABLE_CONSOLE_LOG", false),
-			LogLevel:          GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
-			AddCityToIp:       GetEnvBool("GLC_ADD_CITY_TO_IP", false),
-			PrintSrcLine:      GetEnvBool("GLC_PRINT_SRC_LINE", false),
+			ApiUrl:           GetEnvStr("GLC_API_URL", ""),
+			System:           GetEnvStr("GLC_SYSTEM", "default"),
+			ApiKey:           GetEnvStr("GLC_API_KEY", "X-GLC-AUTH:glogcenter"),
+			Enable:           GetEnvBool("GLC_ENABLE", false),
+			EnableConsoleLog: GetEnvBool("GLC_ENABLE_CONSOLE_LOG", true),
+			LogLevel:         GetEnvStr("GLC_LOG_LEVEL", "DEBUG"),
+			TraceId:          GetEnvStr("GLC_TRACE_ID", ""),
+			PrintSrcLine:     GetEnvBool("GLC_PRINT_SRC_LINE", false),
 		}
 	} else {
 		if o.ApiUrl == "" {
@@ -162,7 +162,7 @@ func logParams(v ...any) ([]any, *GlcData) {
 
 func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 
-	if g == nil || !g.opt.DisableConsoleLog {
+	if g == nil || g.opt.EnableConsoleLog {
 		log.Println(append([]any{level}, params...)...) // 控制台日志
 	}
 	if g == nil || g.stop || !g.opt.Enable || g.opt.ApiUrl == "" {
@@ -175,6 +175,7 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 		ServerName: g.opt.ServerName,
 		ServerIp:   g.opt.ServerIp,
 		ClientIp:   g.opt.ClientIp,
+		TraceId:    g.opt.TraceId,
 		LogLevel:   level,
 	}
 
@@ -209,10 +210,6 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 	}
 	if glcData.TraceId == "" {
 		glcData.TraceId = HashString(ULID())
-	}
-	if g.opt.AddCityToIp {
-		glcData.ServerIp = GetCityIp(glcData.ServerIp)
-		glcData.ClientIp = GetCityIp(glcData.ClientIp)
 	}
 
 	g.busy = true
