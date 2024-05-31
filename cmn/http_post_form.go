@@ -27,7 +27,7 @@ func HttpPostForm(url string, formMap map[string]string, headers ...string) ([]b
 	for i, max := 0, len(headers); i < max; i++ {
 		strs := Split(headers[i], ":")
 		if len(strs) > 1 {
-			request.Header.Set(Trim(strs[0]), Trim(strs[1]))
+			request.Header.Set(Trim(strs[0]), Trim(Join(strs[1:], ":")))
 		}
 	}
 

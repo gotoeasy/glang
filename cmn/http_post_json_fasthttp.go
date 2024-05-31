@@ -24,7 +24,7 @@ func FasthttpPostJson(url string, jsondata string, headers ...string) ([]byte, e
 	for i, max := 0, len(headers); i < max; i++ {
 		strs := Split(headers[i], ":")
 		if len(strs) > 1 {
-			req.Header.Set(Trim(strs[0]), Trim(strs[1]))
+			req.Header.Set(Trim(strs[0]), Trim(Join(strs[1:], ":")))
 		}
 	}
 
