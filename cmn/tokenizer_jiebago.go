@@ -1,8 +1,6 @@
 package cmn
 
 import (
-	"path/filepath"
-	"runtime"
 	"sync"
 
 	"github.com/wangbin/jiebago"
@@ -29,11 +27,13 @@ func NewTokenizerJiebago(dicFile string) *TokenizerJiebago {
 	}
 
 	// 载入词典
-	if IsBlank(dicFile) {
-		// dicFile = "data/dictionary.txt"
-		_, filename, _, _ := runtime.Caller(0) // 当前go文件所在路径
-		dicFile = filepath.Join(filepath.Dir(filename), "data/dictionary.txt")
+	if !IsExistFile(dicFile) {
+		dicFile = "/opt/dict.txt" // 默认字典路径
+		if !IsExistFile(dicFile) {
+			dicFile = CreateBlankTempFile() // 应自行管理字典路径，找不到时给个空白字典
+		}
 	}
+
 	var segmenter jiebago.Segmenter
 	segmenter.LoadDictionary(dicFile)
 
@@ -43,7 +43,7 @@ func NewTokenizerJiebago(dicFile string) *TokenizerJiebago {
 	}
 
 	// 初始化默认忽略的字符单字
-	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n你我他它的是"
+	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n"
 	for _, s := range ingoreChars {
 		_segmenterJiebago.mapIngoreWords[string(s)] = true
 	}

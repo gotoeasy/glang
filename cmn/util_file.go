@@ -160,3 +160,10 @@ func ReadFileString(filename string) (string, error) {
 	}
 	return BytesToString(by), nil
 }
+
+// 在系统目录中创建临时文件
+func CreateBlankTempFile() string {
+	file := os.TempDir() + "/" + ULID() + ".txt"
+	WriteFileString(file, "")
+	return file
+}

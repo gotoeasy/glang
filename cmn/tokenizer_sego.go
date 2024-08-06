@@ -27,8 +27,11 @@ func NewTokenizerSego(dicFile string) *TokenizerSego {
 	}
 
 	// 载入词典
-	if IsBlank(dicFile) {
-		dicFile = "data/dictionary.txt"
+	if !IsExistFile(dicFile) {
+		dicFile = "/opt/dict.txt" // 默认字典路径
+		if !IsExistFile(dicFile) {
+			dicFile = CreateBlankTempFile() // 应自行管理字典路径，找不到时给个空白字典
+		}
 	}
 	var segmenter sego.Segmenter
 	segmenter.LoadDictionary(dicFile)
@@ -38,7 +41,7 @@ func NewTokenizerSego(dicFile string) *TokenizerSego {
 		mapIngoreWords: make(map[string]bool),
 	}
 	// 初始化默认忽略的字符单字
-	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n你我他它的是"
+	ingoreChars := "`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n"
 	for _, s := range ingoreChars {
 		_segmenterSego.mapIngoreWords[string(s)] = true
 	}
@@ -91,6 +94,9 @@ func (t *TokenizerSego) CutForSearchEx(str string, addWords []string, delWords [
 	// 添加自定义的单词
 	for _, word := range addWords {
 		w := ToLower(word)
+		if w == "" {
+			continue
+		}
 		if _, has := mapStr[w]; has {
 			continue // 去重
 		}
