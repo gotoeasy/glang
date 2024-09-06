@@ -101,6 +101,8 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 		glc.logLevel = 3
 	} else if EqualsIngoreCase("ERROR", o.LogLevel) {
 		glc.logLevel = 4
+	} else {
+		glc.logLevel = 1 // 默认DEBUG
 	}
 
 	go func() {
