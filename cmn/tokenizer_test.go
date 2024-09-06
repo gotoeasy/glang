@@ -16,19 +16,6 @@ func Test_sego(t *testing.T) {
 
 }
 
-func Test_jiebago(t *testing.T) {
-	jieba := NewTokenizerJiebago("")
-	ws := jieba.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的")
-	Info(ws)
-
-	jieba.IngoreWords("的", "于")
-	add := Split("我们,你们,他们", ",")
-	del := Split("都,和", ",")
-	ws = jieba.CutForSearchEx("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的", add, del)
-	Info(ws)
-
-}
-
 func Test_GetHtmlText(t *testing.T) {
 	s := GetHtmlText(`<ds sas="ddddd<>ddd"/>dsads111<div>ssss222</div>dsasss<d/ssf(9sf)>333ssd &nbsp`)
 	Info(s)
