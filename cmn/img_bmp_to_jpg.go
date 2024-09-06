@@ -21,7 +21,7 @@ func ImgBmpToJpg(buf []byte, o *jpeg.Options) []byte {
 	}
 
 	newBuf := bytes.Buffer{}
-	err = jpeg.Encode(&newBuf, img, nil)
+	err = jpeg.Encode(&newBuf, img, o)
 	if err != nil {
 		Error(err)
 		return buf

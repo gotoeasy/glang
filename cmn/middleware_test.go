@@ -36,7 +36,7 @@ func Test_leveldb(t *testing.T) {
 		ApiUrl:   GetEnvStr("GLC_API_URL", "http://ip:port/glc/v1/log/add"),
 		System:   GetEnvStr("GLC_SYSTEM", "glang/cmn"),
 		ApiKey:   GetEnvStr("GLC_API_KEY", ""),
-		Enable:   GetEnvBool("GLC_ENABLE", true),
+		Enable:   GetEnvStr("GLC_ENABLE", "true"),
 		LogLevel: GetEnvStr("GLC_LOG_LEVEL", "debug"),
 	}))
 
