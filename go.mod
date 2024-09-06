@@ -1,8 +1,6 @@
 module github.com/gotoeasy/glang
 
-go 1.22
-
-toolchain go1.22.7
+go 1.23
 
 require (
 	github.com/anaskhan96/soup v1.2.5
