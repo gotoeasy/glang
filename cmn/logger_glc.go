@@ -3,7 +3,6 @@ package cmn
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"time"
 )
@@ -181,16 +180,17 @@ func logParams(v ...any) ([]any, *GlcData) {
 }
 
 func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
-
+	now := Now() // 系统时间 yyyy-MM-dd HH:mm:ss.SSS
 	if g == nil || g.opt.enableConsoleLog {
-		log.Println(append([]any{level}, params...)...) // 控制台日志
+		// log.Println(append([]any{now, level}, params...)...) // 控制台日志
+		fmt.Println(append([]any{now, level}, params...)...) // 控制台日志
 	}
 	if g == nil || g.stop || !g.opt.enable || g.opt.ApiUrl == "" {
 		return
 	}
 
 	glcData := &GlcData{
-		Date:       Now(),
+		Date:       now,
 		System:     g.opt.System,
 		ServerName: g.opt.ServerName,
 		ServerIp:   g.opt.ServerIp,
