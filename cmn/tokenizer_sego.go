@@ -1,7 +1,6 @@
 package cmn
 
 import (
-	"os"
 	"sync"
 
 	"github.com/gotoeasy/sego"
@@ -17,7 +16,7 @@ var _segmenterSegoMu sync.Mutex
 
 // 创建中文分词器（sego）
 // 从文件中载入词典，参数在前的词典文件优先，未指定时将简单的单字切分
-func NewTokenizerSego(dicFiles ...*os.File) *TokenizerSego {
+func NewTokenizerSego(dicFiles ...string) *TokenizerSego {
 	if _segmenterSego != nil {
 		return _segmenterSego
 	}
@@ -29,7 +28,7 @@ func NewTokenizerSego(dicFiles ...*os.File) *TokenizerSego {
 
 	// 载入词典
 	var segmenter sego.Segmenter
-	segmenter.LoadDictionaryFiles(dicFiles...)
+	segmenter.LoadDictionary(Join(dicFiles, ","))
 
 	_segmenterSego = &TokenizerSego{
 		segmenter:      segmenter,

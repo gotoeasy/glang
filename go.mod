@@ -11,7 +11,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/snappy v0.0.4
-	github.com/gotoeasy/sego v0.1.0
+	github.com/gotoeasy/sego v1.0.1
 	github.com/jxskiss/base62 v1.1.0
 	github.com/libp2p/go-libp2p v0.36.3
 	github.com/minio/minio-go/v7 v7.0.76
