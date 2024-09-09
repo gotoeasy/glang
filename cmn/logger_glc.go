@@ -105,6 +105,15 @@ func NewGlcClient(o *GlcOptions) *GlcClient {
 		}
 	}
 
+	// 允许省略接口路径，默认自动补足以简化使用
+	if o.ApiUrl != "" && !Endwiths(o.ApiUrl, "/glc/v1/log/add") {
+		if Endwiths(o.ApiUrl, "/") {
+			o.ApiUrl += "glc/v1/log/add"
+		} else {
+			o.ApiUrl += "glc/v1/log/add"
+		}
+	}
+
 	glc := &GlcClient{
 		opt:     o,
 		logChan: make(chan *GlcData, 1024),
@@ -183,7 +192,14 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 	now := Now() // 系统时间 yyyy-MM-dd HH:mm:ss.SSS
 	if g == nil || g.opt.enableConsoleLog {
 		// log.Println(append([]any{now, level}, params...)...) // 控制台日志
-		fmt.Println(append([]any{now, level}, params...)...) // 控制台日志
+		t := []any{now, level}
+		if ldm.User != "" {
+			t = append(t, "[user="+ldm.User+"]")
+		}
+		if ldm.TraceId != "" {
+			t = append(t, "[traceid="+ldm.TraceId+"]")
+		}
+		fmt.Println(append(t, params...)...) // 控制台日志
 	}
 	if g == nil || g.stop || !g.opt.enable || g.opt.ApiUrl == "" {
 		return
