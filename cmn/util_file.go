@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -166,4 +167,32 @@ func CreateBlankTempFile() string {
 	file := os.TempDir() + "/" + ULID() + ".txt"
 	WriteFileString(file, "")
 	return file
+}
+
+// 取目录中指定后缀的文件列表(升序)
+func GetFiles(dir string, suffix string) ([]string, error) {
+	var paths []string
+
+	if !IsExistDir(dir) {
+		return paths, nil
+	}
+
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return paths, err
+	}
+
+	for _, file := range files {
+		if Endwiths(file.Name(), suffix) {
+			path := filepath.Join(dir, file.Name())
+			paths = append(paths, path)
+		}
+	}
+
+	// 升序
+	sort.Slice(paths, func(i, j int) bool {
+		return paths[i] < paths[j]
+	})
+
+	return paths, nil
 }
