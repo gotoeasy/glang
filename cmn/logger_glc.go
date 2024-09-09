@@ -58,7 +58,7 @@ type GlcOptions struct {
 var _glc *GlcClient
 
 func init() {
-	if GetEnvBool("GLC_ENABLE", false) {
+	if !GetEnvBool("GLC_ENABLE", false) {
 		_glc = NewGlcClient(nil) // 使用环境变量配置初始化
 	}
 }
@@ -193,10 +193,10 @@ func glcPrint(g *GlcClient, level string, params []any, ldm *GlcData) {
 	if g == nil || g.opt.enableConsoleLog {
 		// log.Println(append([]any{now, level}, params...)...) // 控制台日志
 		t := []any{now, level}
-		if ldm.User != "" {
+		if ldm != nil && ldm.User != "" {
 			t = append(t, "[user="+ldm.User+"]")
 		}
-		if ldm.TraceId != "" {
+		if ldm != nil && ldm.TraceId != "" {
 			t = append(t, "[traceid="+ldm.TraceId+"]")
 		}
 		fmt.Println(append(t, params...)...) // 控制台日志

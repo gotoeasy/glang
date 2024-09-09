@@ -1,9 +1,10 @@
 package cmn
 
 import (
+	"os"
 	"sync"
 
-	"github.com/huichen/sego"
+	"github.com/gotoeasy/sego"
 )
 
 type TokenizerSego struct {
@@ -15,8 +16,8 @@ var _segmenterSego *TokenizerSego
 var _segmenterSegoMu sync.Mutex
 
 // 创建中文分词器（sego）
-// 参数dicFile为字典文件，传入空时默认为"data/dictionary.txt"
-func NewTokenizerSego(dicFile string) *TokenizerSego {
+// 从文件中载入词典，参数在前的词典文件优先，未指定时将简单的单字切分
+func NewTokenizerSego(dicFiles ...*os.File) *TokenizerSego {
 	if _segmenterSego != nil {
 		return _segmenterSego
 	}
@@ -27,14 +28,8 @@ func NewTokenizerSego(dicFile string) *TokenizerSego {
 	}
 
 	// 载入词典
-	if !IsExistFile(dicFile) {
-		dicFile = "/opt/dict.txt" // 默认字典路径
-		if !IsExistFile(dicFile) {
-			dicFile = CreateBlankTempFile() // 应自行管理字典路径，找不到时给个空白字典
-		}
-	}
 	var segmenter sego.Segmenter
-	segmenter.LoadDictionary(dicFile)
+	segmenter.LoadDictionaryFiles(dicFiles...)
 
 	_segmenterSego = &TokenizerSego{
 		segmenter:      segmenter,
