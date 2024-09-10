@@ -2,6 +2,7 @@ package cmn
 
 import (
 	"archive/zip"
+	"bytes"
 	"io"
 	"os"
 	"path/filepath"
@@ -107,6 +108,47 @@ func UnZip(zipFile string, destPath string) error {
 			defer outFile.Close()
 
 			_, err = io.Copy(outFile, inFile)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func UnZipBytes(bts []byte, destPath string) error {
+	zipReader, err := zip.NewReader(bytes.NewReader(bts), int64(len(bts)))
+	if err != nil {
+		return err
+	}
+
+	for _, f := range zipReader.File {
+		fName, err := decodeGBK(f.Name)
+		if err != nil {
+			fName = f.Name
+		}
+
+		path := filepath.Join(destPath, fName)
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, os.ModePerm)
+		} else {
+			if err = os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+				return err
+			}
+
+			rc, err := f.Open()
+			if err != nil {
+				return err
+			}
+			defer rc.Close()
+
+			outFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer outFile.Close()
+
+			_, err = io.Copy(outFile, rc)
 			if err != nil {
 				return err
 			}
