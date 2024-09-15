@@ -89,14 +89,14 @@ func (c *Cache) Keys() []string {
 }
 
 // 取缓存的所有有效期内的值
-func (c *Cache) Values() []string {
+func (c *Cache) Values() []any {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var values []string
-	for key, item := range c.items {
+	var values []any
+	for _, item := range c.items {
 		if !time.Now().After(item.expiration) {
-			values = append(values, key)
+			values = append(values, item.value)
 		}
 	}
 	return values
