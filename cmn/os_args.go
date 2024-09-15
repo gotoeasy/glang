@@ -7,6 +7,7 @@ import (
 // 命令行解析结果
 type OsArgs struct {
 	String        string // 原命令
+	ArgCount      int    // 参数个数(含命令本身)
 	mapIndexValue map[int]string
 	mapCmd        map[string]bool
 	mapParam      map[string]string
@@ -25,15 +26,13 @@ func ParseArgs(customCmds ...string) *OsArgs {
 	args.mapParam = make(map[string]string)
 	args.mapCustomCmd = make(map[string]bool)
 	args.String = Join(os.Args, " ")
+	args.ArgCount = len(os.Args)
 
 	for _, cmd := range customCmds {
 		args.mapCustomCmd[ToLower(Trim(cmd))] = true
 	}
 
 	for index, arg := range os.Args {
-		if index == 0 {
-			continue // 跳过命令本身
-		}
 		args.mapIndexValue[index] = arg
 		args.LastParam = arg // 最后一个参数作为命令的输入看待
 	}
@@ -108,4 +107,8 @@ func (o *OsArgs) HasCmd(names ...string) bool {
 		}
 	}
 	return false
+}
+
+func (o *OsArgs) GetArgByIndex(index int) string {
+	return o.mapIndexValue[index]
 }

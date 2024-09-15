@@ -32,6 +32,11 @@ func FileExtName(name string) string {
 
 // 判断文件是否存在
 func IsExistFile(file string) bool {
+	defer func() {
+		if err := recover(); err != nil {
+			// 非法路径导致的panic，忽略掉，默认的返回值是false
+		}
+	}()
 	s, err := os.Stat(file)
 	if err == nil {
 		return !s.IsDir()
@@ -44,6 +49,11 @@ func IsExistFile(file string) bool {
 
 // 判断文件夹是否存在
 func IsExistDir(dir string) bool {
+	defer func() {
+		if err := recover(); err != nil {
+			// 非法路径导致的panic，忽略掉，默认的返回值是false
+		}
+	}()
 	s, err := os.Stat(dir)
 	if err == nil {
 		return s.IsDir()
