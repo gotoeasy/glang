@@ -1,4 +1,4 @@
-package cmn
+package img
 
 import (
 	"testing"

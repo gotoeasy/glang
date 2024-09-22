@@ -1,4 +1,4 @@
-package cmn
+package mail
 
 import (
 	"github.com/gotoeasy/glang/cmn"

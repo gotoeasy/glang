@@ -1,4 +1,4 @@
-package cmn
+package p2p
 
 import (
 	"context"

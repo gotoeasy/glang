@@ -1,4 +1,4 @@
-package cmn
+package win
 
 import (
 	"path/filepath"
