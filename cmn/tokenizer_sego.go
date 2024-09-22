@@ -28,7 +28,7 @@ func NewTokenizerSego(dicFiles ...string) *TokenizerSego {
 
 	// 载入词典
 	var segmenter sego.Segmenter
-	segmenter.LoadDictionary(Join(dicFiles, ","))
+	segmenter.LoadWithDefaultDictionary(dicFiles...)
 
 	_segmenterSego = &TokenizerSego{
 		segmenter:      segmenter,
