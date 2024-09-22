@@ -3,6 +3,8 @@ package cmn
 import (
 	"reflect"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type DbValue struct {
@@ -19,40 +21,40 @@ func (d *DbValue) String() string {
 		return d.value.(string)
 	case reflect.Int:
 		i := d.value.(int)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Int8:
 		i := d.value.(int8)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Int16:
 		i := d.value.(int16)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Int32:
 		i := d.value.(int32)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Int64:
 		i := d.value.(int64)
-		return Int64ToString(i)
+		return cmn.Int64ToString(i)
 	case reflect.Uint:
 		i := d.value.(uint)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Uint8:
 		i := d.value.(uint8)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Uint16:
 		i := d.value.(uint16)
-		return Int64ToString(int64(i))
+		return cmn.Int64ToString(int64(i))
 	case reflect.Uint32:
 		i := d.value.(uint32)
-		return Uint32ToString(i)
+		return cmn.Uint32ToString(i)
 	case reflect.Uint64:
 		i := d.value.(uint64)
-		return Uint64ToString(i)
+		return cmn.Uint64ToString(i)
 	case reflect.Float32:
 		i := d.value.(float32)
-		return Float64ToString(float64(i))
+		return cmn.Float64ToString(float64(i))
 	case reflect.Float64:
 		i := d.value.(float64)
-		return Float64ToString(i)
+		return cmn.Float64ToString(i)
 	default:
 		if b, ok := d.value.([]uint8); ok {
 			return string(b)
@@ -62,7 +64,7 @@ func (d *DbValue) String() string {
 }
 
 func (d *DbValue) Int() int {
-	return StringToInt(Int64ToString(d.Int64()), 0)
+	return cmn.StringToInt(cmn.Int64ToString(d.Int64()), 0)
 }
 
 func (d *DbValue) Int64() int64 {
@@ -103,17 +105,17 @@ func (d *DbValue) Int64() int64 {
 		return int64(i)
 	case reflect.Float32:
 		i := d.value.(float32)
-		return Float64ToInt64(float64(i))
+		return cmn.Float64ToInt64(float64(i))
 	case reflect.Float64:
 		i := d.value.(float64)
-		return Float64ToInt64(i)
+		return cmn.Float64ToInt64(i)
 	case reflect.String:
 		s := d.value.(string)
-		return StringToInt64(s, 0)
+		return cmn.StringToInt64(s, 0)
 	default:
 		if b, ok := d.value.([]uint8); ok {
 			s := string(b)
-			return StringToInt64(s, 0)
+			return cmn.StringToInt64(s, 0)
 		}
 	}
 	return 0
@@ -163,11 +165,11 @@ func (d *DbValue) Float64() float64 {
 		return i
 	case reflect.String:
 		s := d.value.(string)
-		return String2Float64(s, 0)
+		return cmn.String2Float64(s, 0)
 	default:
 		if b, ok := d.value.([]uint8); ok {
 			s := string(b)
-			return String2Float64(s, 0)
+			return cmn.String2Float64(s, 0)
 		}
 	}
 	return 0

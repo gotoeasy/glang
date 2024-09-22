@@ -3,6 +3,8 @@ package cmn
 import (
 	"bytes"
 	"reflect"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type SqlInserter struct {
@@ -25,7 +27,7 @@ func (o *SqlInserter) Insert(entity any) *SqlInserter {
 		// TODO 设定 CreateUser,CreateTime
 		o.entity = entity
 	} else {
-		Error("实体类型有误，Insert仅支持结构体对象参数", entity)
+		cmn.Error("实体类型有误，Insert仅支持结构体对象参数", entity)
 	}
 	return o
 }

@@ -4,17 +4,18 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/mitchellh/mapstructure"
 )
 
 // 转数据库表名（驼峰转下划线小写）
 func DbTableName(name string) string {
-	return CamelToUnderline(name)
+	return cmn.CamelToUnderline(name)
 }
 
 // 转数据库字段名（驼峰转下划线小写）
 func DbFieldName(name string) string {
-	return CamelToUnderline(name)
+	return cmn.CamelToUnderline(name)
 }
 
 // 反射解析出结构体类型

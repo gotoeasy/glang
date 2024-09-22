@@ -1,6 +1,10 @@
 package cmn
 
-import "bytes"
+import (
+	"bytes"
+
+	"github.com/gotoeasy/glang/cmn"
+)
 
 type SqlDeleter struct {
 	table  string
@@ -102,7 +106,7 @@ func (d *SqlDeleter) In(column string, params ...any) *SqlDeleter {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"
@@ -123,7 +127,7 @@ func (d *SqlDeleter) NotIn(column string, params ...any) *SqlDeleter {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"

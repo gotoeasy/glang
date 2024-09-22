@@ -3,6 +3,8 @@ package cmn
 import (
 	"bytes"
 	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type SqlSelector struct {
@@ -174,7 +176,7 @@ func (d *SqlSelector) In(column string, params ...any) *SqlSelector {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"
@@ -195,7 +197,7 @@ func (d *SqlSelector) NotIn(column string, params ...any) *SqlSelector {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"

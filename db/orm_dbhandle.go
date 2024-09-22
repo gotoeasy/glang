@@ -33,7 +33,7 @@ func initSqlDb() (*sql.DB, error) {
 	}
 
 	// TODO 读取配置
-	dataSource := GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
+	dataSource := cmn.GetEnvStr("MySqlDataSource") // 例："user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8"
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
 		return nil, errors.Join(mysql.ErrInvalidConn, err)
@@ -76,26 +76,26 @@ func (d *DbHandle) BeginTransaction() {
 		return // 忽视
 	}
 	if d.IsAutoCommit() {
-		Warn("忽略开启事务操作（当前是自动提交模式）", d.opt.GlcData)
+		cmn.Warn("忽略开启事务操作（当前是自动提交模式）", d.opt.GlcData)
 		return
 	}
 
 	if d.db == nil || d.err != nil {
-		Error("开启事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
+		cmn.Error("开启事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
 		return
 	}
 
 	if d.tx != nil {
-		Error("重复开启事务（忽略操作）", d.opt.GlcData)
+		cmn.Error("重复开启事务（忽略操作）", d.opt.GlcData)
 		return // 重复Begin不出错，简单忽视
 	}
 
 	tx, err := d.db.Begin()
 	if err != nil {
 		d.err = err
-		Error("开启事务失败：", err, d.opt.GlcData)
+		cmn.Error("开启事务失败：", err, d.opt.GlcData)
 	} else {
-		Debug("开启事务", d.opt.GlcData)
+		cmn.Debug("开启事务", d.opt.GlcData)
 		d.tx = tx
 	}
 }
@@ -106,25 +106,25 @@ func (d *DbHandle) Commit() error {
 		return nil // 忽视
 	}
 	if d.IsAutoCommit() {
-		Warn("忽略提交操作（当前是自动提交模式）", d.opt.GlcData)
+		cmn.Warn("忽略提交操作（当前是自动提交模式）", d.opt.GlcData)
 		return nil
 	}
 
 	if d.db == nil || d.err != nil {
-		Error("提交事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
+		cmn.Error("提交事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
 		return nil
 	}
 
 	if d.tx == nil {
-		Error("无效的提交（事务还没有开始，忽略操作）", d.opt.GlcData)
+		cmn.Error("无效的提交（事务还没有开始，忽略操作）", d.opt.GlcData)
 		return nil
 	}
 	err := d.tx.Commit()
 	if err == nil {
 		d.tx = nil
-		Debug("提交事务", d.opt.GlcData)
+		cmn.Debug("提交事务", d.opt.GlcData)
 	} else {
-		Error("提交事务失败", err, d.opt.GlcData)
+		cmn.Error("提交事务失败", err, d.opt.GlcData)
 	}
 	return err
 }
@@ -135,25 +135,25 @@ func (d *DbHandle) Rollback() error {
 		return nil // 忽视
 	}
 	if d.IsAutoCommit() {
-		Warn("忽略回滚操作（当前是自动提交模式）", d.opt.GlcData)
+		cmn.Warn("忽略回滚操作（当前是自动提交模式）", d.opt.GlcData)
 		return nil
 	}
 
 	if d.db == nil || d.err != nil {
-		Error("回滚事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
+		cmn.Error("回滚事务失败（数据库连接无效或已发生错误）", d.err, d.opt.GlcData)
 		return nil
 	}
 
 	if d.tx == nil {
-		Error("无效的回滚（事务还没有开始，忽略操作）", d.opt.GlcData)
+		cmn.Error("无效的回滚（事务还没有开始，忽略操作）", d.opt.GlcData)
 		return nil
 	}
 	err := d.tx.Rollback()
 	if err == nil {
 		d.tx = nil
-		Debug("回滚事务", d.opt.GlcData)
+		cmn.Debug("回滚事务", d.opt.GlcData)
 	} else {
-		Error("回滚事务失败", err, d.opt.GlcData)
+		cmn.Error("回滚事务失败", err, d.opt.GlcData)
 	}
 	return err
 }
@@ -161,7 +161,7 @@ func (d *DbHandle) Rollback() error {
 // 结束事务（通过recover()捕获错误，没有错误时提交，否则回滚），事务操作失败时返回错误
 func (d *DbHandle) EndTransaction() error {
 	if e := recover(); e != nil {
-		Error("panic:", e)
+		cmn.Error("panic:", e)
 		if d == nil || d.IsAutoCommit() {
 			return nil
 		}
@@ -201,7 +201,7 @@ func (d *DbHandle) Execute(sql string, params ...any) int64 {
 		}
 	} else {
 		// 没开启事务时直接用db
-		Debug("执行SQL未使用事务", d.opt.GlcData)
+		cmn.Debug("执行SQL未使用事务", d.opt.GlcData)
 		rs, e := d.db.Exec(sql, params...)
 		if e != nil {
 			cnt, err = 0, e
@@ -211,9 +211,9 @@ func (d *DbHandle) Execute(sql string, params ...any) int64 {
 	}
 
 	if err == nil {
-		Info(sql, "\n  parameters:", params, "\n ", cnt, "rows affected", d.opt.GlcData)
+		cmn.Info(sql, "\n  parameters:", params, "\n ", cnt, "rows affected", d.opt.GlcData)
 	} else {
-		Error("执行SQL发生错误：", err, "\n", sql, "\n  parameters: ", params, d.opt.GlcData)
+		cmn.Error("执行SQL发生错误：", err, "\n", sql, "\n  parameters: ", params, d.opt.GlcData)
 		panic(err)
 	}
 	return cnt
@@ -251,28 +251,28 @@ func (d *DbHandle) FindMaps(entity any, sql string, params ...any) []map[string]
 	if d.tx != nil {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	}
 
-	Info(sql, "\n  parameters:", params, "\n ", len(maps), "rows selected")
+	cmn.Info(sql, "\n  parameters:", params, "\n ", len(maps), "rows selected")
 	return maps
 }
 
@@ -290,33 +290,33 @@ func (d *DbHandle) FindMap(entity any, sql string, params ...any) map[string]any
 	if d.tx != nil {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	}
 
 	if len(maps) > 0 {
-		Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
+		cmn.Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
 		return maps[0]
 	}
 
-	Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
+	cmn.Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
 	return nil
 }
 
@@ -334,23 +334,23 @@ func (d *DbHandle) FindList(structSlicePtr any, sql string, params ...any) {
 	if d.tx != nil {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, false)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	}
@@ -364,7 +364,7 @@ func (d *DbHandle) FindList(structSlicePtr any, sql string, params ...any) {
 		MapToStruct(maps[i], &obj)
 		root.Set(reflect.Append(root, newItem.Elem()))
 	}
-	Info(sql, "\n  parameters:", params, "\n ", len(maps), "rows selected", d.opt.GlcData)
+	cmn.Info(sql, "\n  parameters:", params, "\n ", len(maps), "rows selected", d.opt.GlcData)
 }
 
 // 查找记录并存入参数所指对象，出错时panic
@@ -382,33 +382,33 @@ func (d *DbHandle) FindOne(structPtr any, sql string, params ...any) bool {
 	if d.tx != nil {
 		rows, err := d.tx.Query(sql, params...) // 事务优先
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	} else {
 		rows, err := d.db.Query(sql, params...) // 没开启事务时直接用db
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 		maps, err = d.fetchToMapArray(mapType, rows, true)
 		if err != nil {
-			Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
+			cmn.Error(sql, "查询出错：", err, "\n  parameters:", params, d.opt.GlcData)
 			panic(err)
 		}
 	}
 
 	if len(maps) > 0 {
 		MapToStruct(maps[0], structPtr)
-		Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
+		cmn.Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
 		return true
 	}
-	Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
+	cmn.Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
 	return false
 }
 
@@ -447,9 +447,9 @@ func (d *DbHandle) FindValue(sql string, params ...any) *DbValue {
 
 		v := d.getDbValue(rows)
 		if v == nil {
-			Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
+			cmn.Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
 		} else {
-			Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
+			cmn.Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
 		}
 		return v
 	} else {
@@ -459,9 +459,9 @@ func (d *DbHandle) FindValue(sql string, params ...any) *DbValue {
 		}
 		v := d.getDbValue(rows)
 		if v == nil {
-			Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
+			cmn.Info(sql, "\n  parameters:", params, "\n ", 0, "rows selected", d.opt.GlcData)
 		} else {
-			Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
+			cmn.Info(sql, "\n  parameters:", params, "\n ", 1, "rows selected", d.opt.GlcData)
 		}
 		return v
 	}
@@ -475,7 +475,7 @@ func (d *DbHandle) getDbValue(rows *sql.Rows) *DbValue {
 		panic(err)
 	}
 	if len(columns) > 1 {
-		panic(errors.New("只能查询1列，实际查询了" + IntToString(len(columns)) + "列"))
+		panic(errors.New("只能查询1列，实际查询了" + cmn.IntToString(len(columns)) + "列"))
 	}
 
 	if rows.Next() {
@@ -530,7 +530,7 @@ func (d *DbHandle) fetchToMapArray(mapType map[string]string, rows *sql.Rows, on
 			} else if mapType[column] == "float64" || mapType[DbFieldName(column)] == "float64" {
 				rowMap[column] = dbValue.Float64()
 			} else {
-				Warn("未支持的结构体字段类型")
+				cmn.Warn("未支持的结构体字段类型")
 				rowMap[column] = dbValue
 			}
 		}

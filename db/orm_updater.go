@@ -1,6 +1,10 @@
 package cmn
 
-import "bytes"
+import (
+	"bytes"
+
+	"github.com/gotoeasy/glang/cmn"
+)
 
 type SqlUpdater struct {
 	table     string
@@ -130,7 +134,7 @@ func (d *SqlUpdater) In(column string, params ...any) *SqlUpdater {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"
@@ -151,7 +155,7 @@ func (d *SqlUpdater) NotIn(column string, params ...any) *SqlUpdater {
 
 	in := ""
 	for _, v := range params {
-		if Len(in) > 0 {
+		if cmn.Len(in) > 0 {
 			in += ", "
 		}
 		in += "?"
