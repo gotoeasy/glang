@@ -7,14 +7,12 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/gotoeasy/glang/cmn"
 )
 
 // 打包指定目录为指定的tar文件
 func TarDir(directory string, tarfilename string) error {
 
-	if !cmn.IsExistDir(directory) {
+	if !IsExistDir(directory) {
 		return errors.New("目录不存在 " + directory)
 	}
 	dir, err := filepath.Abs(directory)
@@ -23,10 +21,10 @@ func TarDir(directory string, tarfilename string) error {
 	}
 
 	// lenPrefix := Len(filepath.Dir(dir)) // 绝对路径除去末尾目录名后的长度
-	lenPrefix := cmn.Len(dir) // 绝对路径除去末尾目录名后的长度
+	lenPrefix := Len(dir) // 绝对路径除去末尾目录名后的长度
 
 	// 创建文件
-	cmn.MkdirAll(cmn.Dir(tarfilename))                                // 建目录确保目录存在
+	MkdirAll(Dir(tarfilename))                                        // 建目录确保目录存在
 	f, err := os.OpenFile(tarfilename, os.O_WRONLY|os.O_CREATE, 0777) // 建文件
 	if err != nil {
 		return err
@@ -51,8 +49,8 @@ func TarDir(directory string, tarfilename string) error {
 		}
 
 		// 写入文件头
-		name := cmn.SubString(path, lenPrefix+1, cmn.Len(path))
-		name = cmn.ReplaceAll(name, "\\", "/")
+		name := SubString(path, lenPrefix+1, Len(path))
+		name = ReplaceAll(name, "\\", "/")
 		hr := &tar.Header{
 			Name:    name,          // 用相对目录名
 			Format:  tar.FormatGNU, // 支持中文目录文件名
@@ -104,8 +102,8 @@ func UnTar(tarFile string, dist string) error {
 			return err
 		}
 		full := filepath.Join(distDir, hdr.Name)
-		if cmn.IsWin() {
-			full = filepath.Join(distDir, cmn.ReplaceAll(hdr.Name, "/", "\\"))
+		if IsWin() {
+			full = filepath.Join(distDir, ReplaceAll(hdr.Name, "/", "\\"))
 		}
 		if hdr.FileInfo().IsDir() {
 			os.MkdirAll(full, 0777)

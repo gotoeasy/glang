@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-
-	"github.com/gotoeasy/glang/cmn"
 )
 
 // 指定文件压缩为gzip文件（文件名不支持中文）
@@ -16,7 +14,7 @@ func Gzip(srcFile string, gzipFile string) error {
 	if err != nil {
 		return err
 	}
-	cmn.MkdirAll(cmn.Dir(gzipFile))
+	MkdirAll(Dir(gzipFile))
 	outFile, err := os.Create(gzipFile)
 	if err != nil {
 		return err
@@ -25,7 +23,7 @@ func Gzip(srcFile string, gzipFile string) error {
 	gz := gzip.NewWriter(outFile)
 	defer gz.Close()
 
-	gz.Name = cmn.FileName(srcFile)
+	gz.Name = FileName(srcFile)
 
 	_, err = io.Copy(gz, inFile)
 	return err

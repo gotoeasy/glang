@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gotoeasy/glang/cmn"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 )
@@ -18,7 +17,7 @@ import (
 // 压缩指定目录为指定的zip文件
 func Zip(srcFileOrPath string, zipPathFile string) error {
 	srcFileorpath := strings.ReplaceAll(srcFileOrPath, "\\", "/") // window得这么干！这是个神奇的地方，不信就试
-	cmn.MkdirAll(cmn.Dir(zipPathFile))
+	MkdirAll(Dir(zipPathFile))
 	zipFile, err := os.Create(zipPathFile)
 	if err != nil {
 		return err
@@ -26,7 +25,7 @@ func Zip(srcFileOrPath string, zipPathFile string) error {
 	defer zipFile.Close()
 
 	// lenPrefix := Len(filepath.Dir(srcFileorpath)) // 绝对路径除去末尾目录名后的长度
-	lenPrefix := cmn.Len(srcFileorpath) // 绝对路径除去末尾目录名后的长度
+	lenPrefix := Len(srcFileorpath) // 绝对路径除去末尾目录名后的长度
 
 	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
@@ -44,8 +43,8 @@ func Zip(srcFileOrPath string, zipPathFile string) error {
 			return err
 		}
 
-		header.Name = cmn.SubString(path, lenPrefix+1, cmn.Len(path))
-		header.Extra = cmn.StringToBytes("file-size:" + strconv.FormatInt(info.Size(), 10) + ";custom:true ")
+		header.Name = SubString(path, lenPrefix+1, Len(path))
+		header.Extra = StringToBytes("file-size:" + strconv.FormatInt(info.Size(), 10) + ";custom:true ")
 
 		if info.IsDir() {
 			header.Name += "/"

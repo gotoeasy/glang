@@ -2,13 +2,11 @@ package cmn
 
 import (
 	"testing"
-
-	"github.com/gotoeasy/glang/cmn"
 )
 
 func Test_gzip(t *testing.T) {
-	cmn.Info(Gzip("f:\\222\\ddd.tar", "f:\\222\\ddd.tar.gz"))
-	cmn.Info(UnGzip("f:\\222\\ddd.tar.gz", "f:\\222\\dddsss"))
+	Info(Gzip("f:\\222\\ddd.tar", "f:\\222\\ddd.tar.gz"))
+	Info(UnGzip("f:\\222\\ddd.tar.gz", "f:\\222\\dddsss"))
 }
 
 func Test_snappy(t *testing.T) {
@@ -16,23 +14,23 @@ func Test_snappy(t *testing.T) {
 	src = `DEBUG ==> Parameters: 1589491593233129481(String), XFD(String), B3特菜档口(String), 003B307620221(String), SC-B3-076(String), SC(String), 王二军(String), 82107(String), 2022-09-22(String), 50400.0000000000(BigDecimal), 6(Integer), 收入-租金(String), 603084(String), 2023-02-01(String), 2023-02-28(String), 4200.0000000000(BigDecimal), 4200.0000000000(BigDecimal), 4000.0000000000(BigDecimal), 200.0000000000(BigDecimal), 5(String), 2023(String), 2(String), 2023-02-01~2023-02-28(String)`
 	src = `ERROR 处理TODO跟进人释放发生异常`
 
-	srcBytes := cmn.StringToBytes(src)
+	srcBytes := StringToBytes(src)
 	bt := Compress(srcBytes)
-	cmn.Info("压缩前字节长", len(srcBytes), "，压缩前后字节长", len(bt))
+	Info("压缩前字节长", len(srcBytes), "，压缩前后字节长", len(bt))
 
 	de := UnCompress(srcBytes)
-	cmn.Info(cmn.BytesToString(de) == src)
+	Info(BytesToString(de) == src)
 }
 
 func Test_gzipbytes(t *testing.T) {
 	s := "测试用字符串 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"
-	gzipData, err := GzipBytes(cmn.StringToBytes(s))
+	gzipData, err := GzipBytes(StringToBytes(s))
 	if err != nil {
-		cmn.Error("GzipBytes ", err)
+		Error("GzipBytes ", err)
 	}
 	ungzipData, err := UnGzipBytes(gzipData)
 	if err != nil {
-		cmn.Error("UnGzipBytes ", err)
+		Error("UnGzipBytes ", err)
 	}
-	cmn.Info(cmn.BytesToString(ungzipData))
+	Info(BytesToString(ungzipData))
 }
