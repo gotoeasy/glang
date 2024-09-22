@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
@@ -181,7 +182,7 @@ func (p *P2pRelayHost) Request(c *fasthttp.RequestCtx, targetHostAddr string, ur
 	if err != nil {
 		return 0, err
 	}
-	fileLength := int64(BytesToUint32(prefix))
+	fileLength := int64(cmn.BytesToUint32(prefix))
 
 	// 读内容
 	if c != nil {
@@ -217,8 +218,8 @@ func ConnectHost(thisHost host.Host, relayHostAddr string) error {
 func WriteBytesToStream(stream network.Stream, dataBytes []byte) error {
 
 	// 写长度
-	requestLength := StringToUint32(IntToString(len(dataBytes)), 0)
-	_, err := stream.Write(Uint32ToBytes(requestLength))
+	requestLength := cmn.StringToUint32(cmn.IntToString(len(dataBytes)), 0)
+	_, err := stream.Write(cmn.Uint32ToBytes(requestLength))
 	if err != nil {
 		return err
 	}
@@ -239,7 +240,7 @@ func ReadBytesFromStream(stream network.Stream) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	messageLength := BytesToUint32(prefix)
+	messageLength := cmn.BytesToUint32(prefix)
 
 	// 读内容
 	message := make([]byte, messageLength)

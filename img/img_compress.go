@@ -6,6 +6,7 @@ import (
 	"image/jpeg"
 	"image/png"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/nfnt/resize"
 )
 
@@ -16,17 +17,17 @@ import (
 // maxHeight：压缩后的最大高度
 // o：压缩比例（nil时为默认80%）
 func ImgResize(srcFile string, distFile string, maxWidth uint, maxHeight uint, o *jpeg.Options) {
-	by, err := ReadFileBytes(srcFile)
+	by, err := cmn.ReadFileBytes(srcFile)
 	if err != nil {
-		Warn(err)
-		WriteFileBytes(distFile, by)
+		cmn.Warn(err)
+		cmn.WriteFileBytes(distFile, by)
 		return
 	}
 
 	nby := ImgCompress(by, maxWidth, maxHeight, o)
-	err = WriteFileBytes(distFile, nby)
+	err = cmn.WriteFileBytes(distFile, nby)
 	if err != nil {
-		Warn(err)
+		cmn.Warn(err)
 	}
 }
 
@@ -39,7 +40,7 @@ func ImgCompress(buf []byte, maxWidth uint, maxHeight uint, o *jpeg.Options) []b
 	// 文件压缩
 	img, layout, err := image.Decode(bytes.NewReader(buf))
 	if err != nil {
-		Warn(err)
+		cmn.Warn(err)
 		return buf
 	}
 
@@ -56,11 +57,11 @@ func ImgCompress(buf []byte, maxWidth uint, maxHeight uint, o *jpeg.Options) []b
 	case "jpeg", "jpg":
 		err = jpeg.Encode(&newBuf, set, o)
 	default:
-		Warn("暂不支持该文件压缩")
+		cmn.Warn("暂不支持该文件压缩")
 		return buf
 	}
 	if err != nil {
-		Warn(err)
+		cmn.Warn(err)
 		return buf
 	}
 	if newBuf.Len() < len(buf) {

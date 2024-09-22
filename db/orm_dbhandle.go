@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gotoeasy/glang/cmn"
 )
 
 var _sqlDb *sql.DB
@@ -21,8 +22,8 @@ type DbHandle struct {
 
 // 配置项
 type DbOption struct {
-	AutoCommit bool     // 是否自动提交
-	GlcData    *GlcData // 需要使用GLC日志跟踪码等信息时传入
+	AutoCommit bool         // 是否自动提交
+	GlcData    *cmn.GlcData // 需要使用GLC日志跟踪码等信息时传入
 }
 
 // 初始化数据库配置

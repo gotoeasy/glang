@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image/jpeg"
 
+	"github.com/gotoeasy/glang/cmn"
 	"golang.org/x/image/bmp"
 )
 
@@ -12,7 +13,7 @@ func ImgBmpToJpg(buf []byte, o *jpeg.Options) []byte {
 
 	img, err := bmp.Decode(bytes.NewReader(buf))
 	if err != nil {
-		Error(err)
+		cmn.Error(err)
 		return buf
 	}
 
@@ -23,7 +24,7 @@ func ImgBmpToJpg(buf []byte, o *jpeg.Options) []byte {
 	newBuf := bytes.Buffer{}
 	err = jpeg.Encode(&newBuf, img, o)
 	if err != nil {
-		Error(err)
+		cmn.Error(err)
 		return buf
 	}
 

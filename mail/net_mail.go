@@ -1,6 +1,7 @@
 package cmn
 
 import (
+	"github.com/gotoeasy/glang/cmn"
 	"gopkg.in/gomail.v2"
 )
 
@@ -52,7 +53,7 @@ func (m *MailSender) SendMail(to string, subject string, bodyHtml string, attach
 	if attachs != nil {
 		for i := 0; i < len(attachs); i++ {
 			attach := attachs[i]
-			if IsExistFile(attach) {
+			if cmn.IsExistFile(attach) {
 				mailer.Attach(attach)
 			}
 		}

@@ -190,9 +190,9 @@ func (b *BaiduOcr) compressImg(buf []byte) []byte {
 		err = png.Encode(&newBuf, set)
 	case "jpeg", "jpg":
 		err = jpeg.Encode(&newBuf, set, &jpeg.Options{Quality: 80})
-	case "bmp":
-		jpgBuf := ImgBmpToJpg(buf, nil)
-		return b.compressImg(jpgBuf)
+	// case "bmp":
+	// 	jpgBuf := ImgBmpToJpg(buf, nil)
+	// 	return b.compressImg(jpgBuf)
 	default:
 		Error("暂不支持该文件压缩")
 		return buf
