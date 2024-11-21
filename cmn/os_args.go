@@ -57,7 +57,7 @@ func NewOsArgs(customCmds ...string) *OsArgs {
 			// 上一个参数是参数，则当前参数是参数值
 			val := arg
 			if IsWin() {
-				val := ReplaceAll(val, "\\r", "\r")
+				val = ReplaceAll(val, "\\r", "\r")
 				val = ReplaceAll(val, "\\n", "\n")
 				val = ReplaceAll(val, "\\t", "\t")
 			}
