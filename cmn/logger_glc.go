@@ -176,11 +176,14 @@ func (g *GlcClient) Error(v ...any) {
 func logParams(v ...any) ([]any, *GlcData) {
 	var ary []any
 	var ldm *GlcData
-	for i := 0; i < len(v); i++ {
+	for i := range v {
 		if v[i] != nil {
 			if reflect.TypeOf(v[i]) == ldmType {
 				ldm = v[i].(*GlcData)
 			} else {
+				if i > 0 {
+					ary = append(ary, " ")
+				}
 				ary = append(ary, v[i])
 			}
 		}
