@@ -120,3 +120,12 @@ func MeasureDisks() []*disk.UsageStat {
 func MeasureHost() (*host.InfoStat, error) {
 	return host.Info()
 }
+
+// 主机ID的哈希码
+func HashHostId() (string, error) {
+	info, err := host.Info()
+	if err != nil {
+		return "", err
+	}
+	return HashString(info.HostID), nil
+}
