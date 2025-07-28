@@ -122,10 +122,10 @@ func MeasureHost() (*host.InfoStat, error) {
 }
 
 // 主机ID的哈希码
-func HashHostId() (string, error) {
+func HashHostId() string {
 	info, err := host.Info()
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return HashString(info.HostID), nil
+	return HashString(info.HostID)
 }
