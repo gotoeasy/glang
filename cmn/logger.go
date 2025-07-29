@@ -1,6 +1,9 @@
 package cmn
 
-import "runtime"
+import (
+	"runtime"
+	"time"
+)
 
 // 打印Debug级别日志，参数将忽略nil，参数含多个GlcData时仅最后一个有效
 func Debug(v ...any) {
@@ -60,6 +63,7 @@ func Error(v ...any) {
 
 // 停止接收新的日志并等待日志全部输出完成
 func WaitGlcFinish() {
+	time.Sleep(time.Millisecond * 100)
 	if _glc != nil {
 		_glc.WaitFinish()
 	}
