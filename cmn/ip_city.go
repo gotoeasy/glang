@@ -86,7 +86,7 @@ func GetCityByIp_pconline(ip string) string {
 
 	// {"ip":"x.x.x.x","pro":"浙江省","proCode":"330000","city":"杭州市","cityCode":"330100","region":"","regionCode":"0","addr":"浙江省杭州市 电信","regionNames":"","err":""}
 	url := "https://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
-	bt, err := HttpGetJsonTimeout(url, time.Second)
+	bt, err := HttpGetJsonTimeout(url, 3*time.Second)
 	if err != nil {
 		return ""
 	}
@@ -128,7 +128,7 @@ func GetCityByIp_ip9(ip string) string {
 
 	// {"ret":200,"data":{"ip":"xxx.xxx.xxx.xxx","country":"中国","country_code":"cn","prov":"广东","city":"深圳","city_code":"shenzhen","city_short_code":"sz","area":"龙岗","post_code":"518116","area_code":"0755","isp":"中国电信","lng":"114.24771","lat":"22.71986","long_ip":2032275147,"big_area":"华南"},"qt":0}
 	url := "https://ip9.com.cn/get?ip=" + ip
-	bt, err := HttpGetJsonTimeout(url, time.Second)
+	bt, err := HttpGetJsonTimeout(url, 3*time.Second)
 	if err != nil {
 		return ""
 	}
@@ -139,7 +139,12 @@ func GetCityByIp_ip9(ip string) string {
 		return ""
 	}
 
-	return getIpStr(d)
+	rsAddr := getIpStr(d)
+
+	if rsAddr != "" {
+		_ipCache.Add(ip, rsAddr)
+	}
+	return rsAddr
 }
 
 func getIpStr(d *ipInfoResponse) string {
@@ -149,12 +154,13 @@ func getIpStr(d *ipInfoResponse) string {
 	}
 
 	rs += ReplaceAll(d.Data.Country, "中国", "")
+	rs += d.Data.Province
 	rs += d.Data.City
 	rs += d.Data.Area
 
 	if d.Data.ISP != "" {
 		rs += " "
-		rs += d.Data.ISP
+		rs += ReplaceAll(d.Data.ISP, "中国", "")
 	}
 
 	return rs
