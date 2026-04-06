@@ -59,13 +59,19 @@ func (e *EventBus) Off(event string, delHandles ...EventHandler) *EventBus {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	if delHandles == nil || len(delHandles) < 1 {
+	if delHandles == nil {
+		return e
+	}
+	if len(delHandles) < 1 {
 		return e
 	}
 
 	name := ToLower(Trim(event))
 	handles := e.mapHandle[name]
-	if handles == nil || len(handles) < 1 {
+	if handles == nil {
+		return e
+	}
+	if len(handles) < 1 {
 		return e
 	}
 
@@ -95,7 +101,10 @@ func (e *EventBus) Del(event string) *EventBus {
 
 	name := ToLower(Trim(event))
 	handles := e.mapHandle[name]
-	if handles == nil || len(handles) < 1 {
+	if handles == nil {
+		return e
+	}
+	if len(handles) < 1 {
 		return e
 	}
 
@@ -119,7 +128,10 @@ func (e *EventBus) At(event string, params ...any) *EventBus {
 
 	name := ToLower(Trim(event))
 	handles := e.mapHandle[name]
-	if handles == nil || len(handles) < 1 {
+	if handles == nil {
+		return e
+	}
+	if len(handles) < 1 {
 		return e
 	}
 
