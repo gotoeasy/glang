@@ -153,15 +153,19 @@ func getIpStr(d *ipInfoResponse) string {
 		return ""
 	}
 
-	rs += ReplaceAll(d.Data.Country, "中国", "")
+	rs += d.Data.Country
 	rs += d.Data.Province
 	rs += d.Data.City
 	rs += d.Data.Area
 
 	if d.Data.ISP != "" {
-		rs += " "
-		rs += ReplaceAll(d.Data.ISP, "中国", "")
+		rs += " " + d.Data.ISP
 	}
 
+	rs = ReplaceAll(rs, "中国", "中国")
+	rs = ReplaceAll(rs, "北京北京", "北京")
+	rs = ReplaceAll(rs, "天津天津", "天津")
+	rs = ReplaceAll(rs, "上海上海", "上海")
+	rs = ReplaceAll(rs, "重庆重庆", "重庆")
 	return rs
 }
