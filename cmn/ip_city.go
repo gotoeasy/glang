@@ -22,7 +22,6 @@ type ipCityResult struct {
 type ipInfoResponse struct {
 	Ret  int      `json:"ret,omitempty"`
 	Data ipDetail `json:"data,omitempty"`
-	Qt   int      `json:"qt,omitempty"`
 }
 
 // IPDetail IP 详细信息（英文命名）
