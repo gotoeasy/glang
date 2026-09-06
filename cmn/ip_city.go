@@ -96,16 +96,21 @@ func GetCityByIp_pconline(ip string) string {
 		return ""
 	}
 
+	rsAddr := ""
 	if d.Addr != "" {
-		_ipCache.Add(ip, d.Addr)
-		return d.Addr
-	} else if d.Pro != "" && d.Pro == d.City {
-		_ipCache.Add(ip, d.Pro)
-		return d.Pro
+		rsAddr = d.Addr
 	} else {
-		_ipCache.Add(ip, Trim(d.Pro+d.City))
-		return Trim(d.Pro + d.City)
+		rsAddr = Trim(d.Pro + d.City)
 	}
+
+	rsAddr = ReplaceAll(rsAddr, "中国", "")
+	rsAddr = ReplaceAll(rsAddr, "北京北京", "北京")
+	rsAddr = ReplaceAll(rsAddr, "天津天津", "天津")
+	rsAddr = ReplaceAll(rsAddr, "上海上海", "上海")
+	rsAddr = ReplaceAll(rsAddr, "重庆重庆", "重庆")
+	_ipCache.Add(ip, rsAddr)
+
+	return rsAddr
 }
 
 // 获取ip地址信息不含ip
@@ -161,7 +166,7 @@ func getIpStr(d *ipInfoResponse) string {
 		rs += " " + d.Data.ISP
 	}
 
-	rs = ReplaceAll(rs, "中国", "中国")
+	rs = ReplaceAll(rs, "中国", "")
 	rs = ReplaceAll(rs, "北京北京", "北京")
 	rs = ReplaceAll(rs, "天津天津", "天津")
 	rs = ReplaceAll(rs, "上海上海", "上海")
