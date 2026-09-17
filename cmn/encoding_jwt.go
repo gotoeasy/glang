@@ -18,12 +18,12 @@ func NewJWT(secret string) *JWT {
 }
 
 // 创建令牌（默认HS256算法）
-func (j *JWT) CreateToken(mapKv MapString, exp time.Duration) (string, error) {
+func (j *JWT) CreateToken(mapKv MapString, expire time.Duration) (string, error) {
 	claims := make(jwt.MapClaims)
 	for k, v := range mapKv {
 		claims[k] = v
 	}
-	claims["expire"] = time.Now().Add(exp).Unix() // 设定超时时间
+	claims["expire"] = time.Now().Add(expire).Unix() // 设定超时时间
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(j.secret)
 }
 
@@ -36,12 +36,12 @@ func (j *JWT) NewToken(username string) (string, error) {
 }
 
 // 续签令牌（复制原令牌后创建新令牌，原令牌可以是过期令牌）
-func (j *JWT) RefreshToken(token string, exp time.Duration) (string, error) {
+func (j *JWT) RefreshToken(token string, expire time.Duration) (string, error) {
 	m, err := j.Parse(token)
 	if err != nil {
 		return "", err
 	}
-	return j.CreateToken(m, exp)
+	return j.CreateToken(m, expire)
 }
 
 // 判断令牌是否已过期（过期令牌不会返回error，令牌无效时将返回error）
@@ -62,10 +62,10 @@ func (j *JWT) IsExpired(token string) (bool, error) {
 	}
 
 	mc := tk.Claims.(jwt.MapClaims)
-	return Float64ToInt64(mc["exp"].(float64)) <= time.Now().Unix(), nil
+	return Float64ToInt64(mc["expire"].(float64)) <= time.Now().Unix(), nil
 }
 
-// 解析令牌（过期令牌不会产生错误，返回值不包含"exp"属性）
+// 解析令牌（过期令牌不会产生错误，返回值不包含"expire"属性）
 func (j *JWT) Parse(token string) (MapString, error) {
 	tk, err := jwt.Parse(token, func(jwtToken *jwt.Token) (interface{}, error) {
 		if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -84,7 +84,7 @@ func (j *JWT) Parse(token string) (MapString, error) {
 
 	rs := NewMapString()
 	for k, v := range tk.Claims.(jwt.MapClaims) {
-		if k != "exp" {
+		if k != "expire" {
 			rs.Put(k, v.(string))
 		}
 	}
@@ -92,7 +92,7 @@ func (j *JWT) Parse(token string) (MapString, error) {
 	return rs, nil
 }
 
-// 校验令牌（过期令牌会返回error，返回值不包含"exp"属性）
+// 校验令牌（过期令牌会返回error，返回值不包含"expire"属性）
 func (j *JWT) Validate(token string) (MapString, error) {
 	tk, err := jwt.Parse(token, func(jwtToken *jwt.Token) (interface{}, error) {
 		if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -111,7 +111,7 @@ func (j *JWT) Validate(token string) (MapString, error) {
 
 	rs := NewMapString()
 	for k, v := range tk.Claims.(jwt.MapClaims) {
-		if k != "exp" {
+		if k != "expire" {
 			rs.Put(k, v.(string))
 		}
 	}
